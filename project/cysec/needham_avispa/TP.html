@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
   "http://www.w3.org/TR/html4/loose.dtd">  
 <html > 
+<meta charset="UTF-8">
 <head><title>Correcting Needham-Schroeder</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
@@ -27,17 +28,17 @@ class="ecbx-1000">B </span>pour Bob. <span
 class="cmmi-10">k</span><sub><span 
 class="cmmi-7">a</span></sub> et <span 
 class="cmmi-10">k</span><sub><span 
-class="cmmi-7">b</span></sub> sont respectivement les clés
+class="cmmi-7">b</span></sub> sont respectivement les clÃ©s
 publiques de <span 
 class="cmmi-10">A </span>et <span 
 class="cmmi-10">B</span>. On notera inv(<span 
 class="cmmi-10">k</span><sub><span 
-class="cmmi-7">a</span></sub>) la clé privée de <span 
+class="cmmi-7">a</span></sub>) la clÃ© privÃ©e de <span 
 class="cmmi-10">A</span>. <span 
 class="cmmi-10">N</span><sub><span 
 class="cmmi-7">a</span></sub> et <span 
 class="cmmi-10">N</span><sub><span 
-class="cmmi-7">b</span></sub> sont des nonces (nombres aléatoires
+class="cmmi-7">b</span></sub> sont des nonces (nombres alÃ©atoires
 uniques).
      <ol  class="enumerate1" >
      <li 
@@ -78,24 +79,24 @@ class="cmmi-7">b</span></sub><span
 class="cmsy-10">}</span><sub><span 
 class="cmmi-7">k</span><sub><span 
 class="cmmi-5">b</span></sub></sub></li></ol>
-<!--l. 63--><p class="noindent" >L&#8217;opérateur &#8217;.&#8217; est la concaténation de message.
+<!--l. 63--><p class="noindent" >L&#8217;opÃ©rateur &#8217;.&#8217; est la concatÃ©nation de message.
      <ul class="itemize1">
      <li class="itemize">Ce protocole se veut garantir l&#8217;authentication de <span 
-class="cmmi-10">A </span>auprès de <span 
-class="cmmi-10">B </span>et réciproquement</li></ul>
+class="cmmi-10">A </span>auprÃ¨s de <span 
+class="cmmi-10">B </span>et rÃ©ciproquement</li></ul>
 <!--l. 68--><p class="noindent" >A envoit son identite et un nombre <span 
 class="cmmi-10">N</span><sub><span 
-class="cmmi-7">a</span></sub> vers B. Ces informations sont codés par la clé publique de B : juste B peut les
-decrypter. B décrypte puis genere <span 
+class="cmmi-7">a</span></sub> vers B. Ces informations sont codÃ©s par la clÃ© publique de B : juste B peut les
+decrypter. B dÃ©crypte puis genere <span 
 class="cmmi-10">N</span><sub><span 
-class="cmmi-7">b</span></sub>. Il réenvoit <span 
+class="cmmi-7">b</span></sub>. Il rÃ©envoit <span 
 class="cmmi-10">N</span><sub><span 
 class="cmmi-7">a</span></sub> et <span 
 class="cmmi-10">N</span><sub><span 
-class="cmmi-7">b</span></sub> codés par la clé publique de A.
-<!--l. 73--><p class="noindent" >A réenvoie <span 
+class="cmmi-7">b</span></sub> codÃ©s par la clÃ© publique de A.
+<!--l. 73--><p class="noindent" >A rÃ©envoie <span 
 class="cmmi-10">N</span><sub><span 
-class="cmmi-7">b</span></sub> vers B codé par <span 
+class="cmmi-7">b</span></sub> vers B codÃ© par <span 
 class="cmmi-10">k</span><sub><span 
 class="cmmi-7">b</span></sub>
      <ul class="itemize1">
@@ -117,15 +118,15 @@ milieu : MitM
 <!--l. 82--><p class="noindent" >
 <h5 class="likesubsubsectionHead"><a 
  id="x1-1000"></a>Session unique entre A et B</h5>
-<!--l. 86--><p class="noindent" >On considère dans un premier temps une session unique entre A et B : session(A, B, <span 
+<!--l. 86--><p class="noindent" >On considÃ¨re dans un premier temps une session unique entre A et B : session(A, B, <span 
 class="cmmi-10">k</span><sub><span 
 class="cmmi-7">a</span></sub>, <span 
 class="cmmi-10">k</span><sub><span 
 class="cmmi-7">b</span></sub>).
                                                                                                
                                                                                                
-<!--l. 89--><p class="noindent" >En d&#8217;autres termes, il n&#8217;y a qu&#8217;Alice et Bob, pas d&#8217;intrus présent, et nos deux interlocuteurs n&#8217;exécutent le protocole qu&#8217;une
-seule fois. Ceci est exprimé dans la partie environment du fichier HLPSL (il n&#8217;y a qu&#8217;Alice et Bob dans cet
+<!--l. 89--><p class="noindent" >En d&#8217;autres termes, il n&#8217;y a qu&#8217;Alice et Bob, pas d&#8217;intrus prÃ©sent, et nos deux interlocuteurs n&#8217;exÃ©cutent le protocole qu&#8217;une
+seule fois. Ceci est exprimÃ© dans la partie environment du fichier HLPSL (il n&#8217;y a qu&#8217;Alice et Bob dans cet
 environnement).
 <!--l. 94--><p class="noindent" >Si on lance Avispa, on remarque que le SUMMARY est SAFE. Donc pas d&#8217;attaque possible.
 <!--l. 97--><p class="noindent" ><img 
@@ -134,7 +135,7 @@ width="43%" height="43%" >
 <!--l. 99--><p class="noindent" >
 <h5 class="likesubsubsectionHead"><a 
  id="x1-2000"></a>Cas de trois Sessions</h5>
-<!--l. 101--><p class="noindent" >On considère maintenant 3 sessions possibles en parallèle :
+<!--l. 101--><p class="noindent" >On considÃ¨re maintenant 3 sessions possibles en parallÃ¨le :
 <!--l. 103--><p class="noindent" >session(A, B, <span 
 class="cmmi-10">k</span><sub><span 
 class="cmmi-7">a</span></sub>, <span 
@@ -148,9 +149,9 @@ class="cmmi-10">k</span><sub><span
 class="cmmi-7">i</span></sub>, <span 
 class="cmmi-10">k</span><sub><span 
 class="cmmi-7">b</span></sub>)
-<!--l. 106--><p class="noindent" >Une session entre A et B, une session entre A et I et une session entre I et B, I étant l&#8217;intrus.
-<!--l. 109--><p class="noindent" >On note que A parle à B, mais aussi, volontairement à I en utilisant la clé de I, et de même I avec B.
-<!--l. 112--><p class="noindent" >Ce n&#8217;est donc pas exactement une attaque MitM où A et B ne seraient pas conscients de la présence d&#8217;un intrus
+<!--l. 106--><p class="noindent" >Une session entre A et B, une session entre A et I et une session entre I et B, I Ã©tant l&#8217;intrus.
+<!--l. 109--><p class="noindent" >On note que A parle Ã  B, mais aussi, volontairement Ã  I en utilisant la clÃ© de I, et de mÃªme I avec B.
+<!--l. 112--><p class="noindent" >Ce n&#8217;est donc pas exactement une attaque MitM oÃ¹ A et B ne seraient pas conscients de la prÃ©sence d&#8217;un intrus
 furtif.
 <!--l. 115--><p class="noindent" >Si on lance Avispa on trouve qu&#8217;il y a un probleme :
 <!--l. 117--><p class="noindent" ><img 
