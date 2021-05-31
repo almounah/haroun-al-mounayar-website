@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Correcting Needham-Schroeder</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<!-- html --> 
+<meta name="src" content="TP.tex"> 
+<link rel="stylesheet" type="text/css" href="TP.css"> 
+</head><body 
+>
+<div class="maketitle">
+                                                                                               
+                                                                                               
+                                                                                               
+                                                                                               
+
+<h2 class="titleHead">Verification et Correction du Protocole de
+Needham-Schroeder</h2>
+<div class="author" ></div><br />
+<div class="date" ></div>
+</div>On utilise Avispa : un outils puissant pour valider les protocoles cryptographiques.
+<!--l. 53--><p class="noindent" >Soit le protocole suivant (Needham-Schroeder) <span 
+class="ecbx-1000">A </span>pour Alice et <span 
+class="ecbx-1000">B </span>pour Bob. <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">a</span></sub> et <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">b</span></sub> sont respectivement les clés
+publiques de <span 
+class="cmmi-10">A </span>et <span 
+class="cmmi-10">B</span>. On notera inv(<span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">a</span></sub>) la clé privée de <span 
+class="cmmi-10">A</span>. <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub> et <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">b</span></sub> sont des nonces (nombres aléatoires
+uniques).
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x1-3x1"><span 
+class="cmmi-10">A </span><span 
+class="cmsy-10">&#x2192; </span><span 
+class="cmmi-10">B</span>: <span 
+class="cmsy-10">{</span><span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub><span 
+class="cmmi-10">.A</span><span 
+class="cmsy-10">}</span><sub><span 
+class="cmmi-7">k</span><sub><span 
+class="cmmi-5">b</span></sub></sub>
+     </li>
+     <li 
+  class="enumerate" id="x1-5x2"><span 
+class="cmmi-10">B </span><span 
+class="cmsy-10">&#x2192; </span><span 
+class="cmmi-10">A</span>: <span 
+class="cmsy-10">{</span><span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub><span 
+class="cmmi-10">.N</span><sub><span 
+class="cmmi-7">b</span></sub><span 
+class="cmsy-10">}</span><sub><span 
+class="cmmi-7">k</span><sub><span 
+class="cmmi-5">b</span></sub></sub>
+     </li>
+     <li 
+  class="enumerate" id="x1-7x3"><span 
+class="cmmi-10">A </span><span 
+class="cmsy-10">&#x2192; </span><span 
+class="cmmi-10">B</span>: <span 
+class="cmsy-10">{</span><span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">b</span></sub><span 
+class="cmsy-10">}</span><sub><span 
+class="cmmi-7">k</span><sub><span 
+class="cmmi-5">b</span></sub></sub></li></ol>
+<!--l. 63--><p class="noindent" >L&#8217;opérateur &#8217;.&#8217; est la concaténation de message.
+     <ul class="itemize1">
+     <li class="itemize">Ce protocole se veut garantir l&#8217;authentication de <span 
+class="cmmi-10">A </span>auprès de <span 
+class="cmmi-10">B </span>et réciproquement</li></ul>
+<!--l. 68--><p class="noindent" >A envoit son identite et un nombre <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub> vers B. Ces informations sont codés par la clé publique de B : juste B peut les
+decrypter. B décrypte puis genere <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">b</span></sub>. Il réenvoit <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub> et <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">b</span></sub> codés par la clé publique de A.
+<!--l. 73--><p class="noindent" >A réenvoie <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">b</span></sub> vers B codé par <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">b</span></sub>
+     <ul class="itemize1">
+     <li class="itemize">Si <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub> (respectivement <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">b</span></sub>) n&#8217;est pas secret l&#8217;authentication n&#8217;est plus garantie</li></ul>
+<!--l. 78--><p class="noindent" >Si <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub> n&#8217;est pas secret un attaquant O peut reenvoyer vers B <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub><span 
+class="cmmi-10">.A</span><sub><span 
+class="cmmi-7">k</span><sub><span 
+class="cmmi-5">b</span></sub></sub> en lui disant qu&#8217;il est <span 
+class="cmmi-10">A</span>. L&#8217;attaque de l&#8217;homme au
+milieu : MitM
+<!--l. 82--><p class="noindent" >
+<h5 class="likesubsubsectionHead"><a 
+ id="x1-1000"></a>Session unique entre A et B</h5>
+<!--l. 86--><p class="noindent" >On considère dans un premier temps une session unique entre A et B : session(A, B, <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">a</span></sub>, <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">b</span></sub>).
+                                                                                               
+                                                                                               
+<!--l. 89--><p class="noindent" >En d&#8217;autres termes, il n&#8217;y a qu&#8217;Alice et Bob, pas d&#8217;intrus présent, et nos deux interlocuteurs n&#8217;exécutent le protocole qu&#8217;une
+seule fois. Ceci est exprimé dans la partie environment du fichier HLPSL (il n&#8217;y a qu&#8217;Alice et Bob dans cet
+environnement).
+<!--l. 94--><p class="noindent" >Si on lance Avispa, on remarque que le SUMMARY est SAFE. Donc pas d&#8217;attaque possible.
+<!--l. 97--><p class="noindent" ><img 
+src="0_home_almounah_Desktop_ENSIMAG_1A_Semestre_1_Securite_im.png" alt="PIC"  
+width="43%" height="43%" >
+<!--l. 99--><p class="noindent" >
+<h5 class="likesubsubsectionHead"><a 
+ id="x1-2000"></a>Cas de trois Sessions</h5>
+<!--l. 101--><p class="noindent" >On considère maintenant 3 sessions possibles en parallèle :
+<!--l. 103--><p class="noindent" >session(A, B, <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">a</span></sub>, <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">b</span></sub>) || session(A, I, <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">a</span></sub>, <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">i</span></sub>) || session(I, B, <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">i</span></sub>, <span 
+class="cmmi-10">k</span><sub><span 
+class="cmmi-7">b</span></sub>)
+<!--l. 106--><p class="noindent" >Une session entre A et B, une session entre A et I et une session entre I et B, I étant l&#8217;intrus.
+<!--l. 109--><p class="noindent" >On note que A parle à B, mais aussi, volontairement à I en utilisant la clé de I, et de même I avec B.
+<!--l. 112--><p class="noindent" >Ce n&#8217;est donc pas exactement une attaque MitM où A et B ne seraient pas conscients de la présence d&#8217;un intrus
+furtif.
+<!--l. 115--><p class="noindent" >Si on lance Avispa on trouve qu&#8217;il y a un probleme :
+<!--l. 117--><p class="noindent" ><img 
+src="1_home_almounah_Desktop_ENSIMAG_1A_Semestre_1_Securite_im2.png" alt="PIC"  
+width="43%" height="43%" >
+<!--l. 119--><p class="noindent" >En effet <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">b</span></sub> n&#8217;est plus secret; il peut etre connu par <span 
+class="cmmi-10">I</span>. Aussi, l&#8217;authentification de Bob aupres d&#8217;alice avec <span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub> ne marche pas
+: on est UNSAFE.
+<!--l. 123--><p class="noindent" >
+<h4 class="likesubsectionHead"><a 
+ id="x1-3000"></a>Correction du Protocole</h4>
+<!--l. 125--><p class="noindent" >L&#8217;idee est de rajouter dans l&#8217;etape 2 :
+<!--l. 127--><p class="noindent" >2. <span 
+class="cmmi-10">B </span><span 
+class="cmsy-10">&#x2192; </span><span 
+class="cmmi-10">A</span>: <span 
+class="cmsy-10">{</span><span 
+class="cmmi-10">N</span><sub><span 
+class="cmmi-7">a</span></sub><span 
+class="cmmi-10">.N</span><sub><span 
+class="cmmi-7">a</span></sub><span 
+class="cmmi-10">.B</span><span 
+class="cmsy-10">}</span><sub><span 
+class="cmmi-7">k</span><sub><span 
+class="cmmi-5">a</span></sub></sub>
+<!--l. 129--><p class="noindent" >En e effet on est pas sur qui parle. En modifant cela dans l&#8217;automate partout dans Avispa on redevient safe.
+ 
+</body></html> 
+
+                                                                                               
+
+

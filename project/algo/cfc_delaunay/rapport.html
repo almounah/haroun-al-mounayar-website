@@ -1,0 +1,2840 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html xml:lang="fr" > 
+<head><title>A propos du calcul de la distribution des tailles des
+composantes connexes dans un plan</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<!-- html --> 
+<meta name="src" content="rapport.tex"> 
+<link rel="stylesheet" type="text/css" href="rapport.css"> 
+</head><body 
+>
+   <div class="maketitle">
+                                                                                               
+                                                                                               
+                                                                                               
+                                                                                               
+                                                                                               
+                                                                                               
+
+<h2 class="titleHead">A propos du calcul de la distribution des
+tailles des composantes connexes dans un
+plan</h2>
+<div class="author" ><span 
+class="ecrm-1440">Haroun Al Mounayar</span></div><br />
+<div class="date" ><span 
+class="ecti-1200">Ensimag 1A Groupe 2</span></div>
+                                                                                               
+
+                                                                                               
+   </div>
+<p class="indent" > Mes remerciements à David Eisenstat, ingénieur logiciel chez google à New York, pour son aide dans ce projet. 
+   <h3 class="likesectionHead"><a 
+ id="x1-1000"></a>Préface</h3>
+<!--l. 95--><p class="noindent" >
+<p class="indent" > Etant donnee un nombre de point dans un plan et une distance d, on cherche la facon la plus optimale de
+de relier entre eux les points se trouvant à une distance au plus d. Le but final est de calculer la taille
+des composantes fortements connexes. 
+<!--l. 97--><p class="indent" >   Dans ce rapport de projet d&#8217;algorithmique, je présente l&#8217;évolution de mon algorithme et les différentes approches pour
+résoudre le problème posé. Ainsi, la table de matière que je présente dans la page ci-après n&#8217;est autre que les algorithmes
+que j&#8217;ai utilisée et que j&#8217;ai amélioré au fur et à mesure.
+<!--l. 103--><p class="indent" >
+<!--l. 106--><p class="indent" >   La solution optimale que j&#8217;ai trouvée est donc le dernier point de la table de matière : triangulation de Delaunay. C&#8217;est
+cet algorithme uniquement que je remets sur Teide. Les autres parties sont donnés pour montrer l&#8217;évolution de mes
+approches.
+<!--l. 110--><p class="indent" >
+<!--l. 112--><p class="indent" >   En effet, je ne me contente pas seulement de présenter ma solution optimale, je présente aussi les performances
+des différents algorithmes, comment j&#8217;ai élaboré des tests pour mesurer ces performances, etc. Je donne
+aussi quelques preuves et théorèmes qui m&#8217;ont permis d&#8217;améliorer ou de trouver des faiblesses dans certains
+algorithmes.
+<!--l. 118--><p class="indent" >   La mesure des performances est faite sur un ordinateur HP, intel CORE I7, 8GB RAM et ayant comme seul OS KALI
+Linux. Les affichages se font soit avec tycat de terminology, gnuplot avec qterminal ou simplement la librairie MatPlotLib de
+Python. Les codes sont écrits avec Python 3.9.1.
+<!--l. 124--><p class="indent" >
+<!--l. 126--><p class="indent" >   <span 
+class="ecti-1000">Merci,</span>
+                                                                                               <div class="flushright" 
+>
+<!--l. 127--><p class="noindent" >
+ <span 
+class="ecti-1000">21 Fevrier 2021</span>
+</div>
+<!--l. 131--><p class="indent" >   <span 
+class="ecti-1000">Haroun Al Mounayar</span>
+                                                                                               
+
+                                                                                               
+   <h2 class="likechapterHead"><a 
+ id="x1-2000"></a>Table des matières</h2>
+   <div class="tableofcontents">
+   <span class="chapterToc" >1 <a 
+href="#x1-30001" id="QQ2-1-3">Élaboration de test et un premier algorithme naïf</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1.1 <a 
+href="#x1-40001.1" id="QQ2-1-4">Élaboration de test</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1.2 <a 
+href="#x1-50001.2" id="QQ2-1-6">Un premier algorithme naïf</a></span>
+<br />   <span class="chapterToc" >2 <a 
+href="#x1-60002" id="QQ2-1-8">Méthode DBSCAN naïve</a></span>
+<br />   &#x00A0;<span class="sectionToc" >2.1 <a 
+href="#x1-70002.1" id="QQ2-1-9">Principe</a></span>
+<br />   &#x00A0;<span class="sectionToc" >2.2 <a 
+href="#x1-80002.2" id="QQ2-1-10">Algorithme</a></span>
+<br />   &#x00A0;<span class="sectionToc" >2.3 <a 
+href="#x1-90002.3" id="QQ2-1-11">Implementation dans Python</a></span>
+<br />   &#x00A0;<span class="sectionToc" >2.4 <a 
+href="#x1-100002.4" id="QQ2-1-13">Performances</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >2.4.1 <a 
+href="#x1-110002.4.1" id="QQ2-1-14">Nombre de composantes connexes fixé</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >2.4.2 <a 
+href="#x1-120002.4.2" id="QQ2-1-15">Nombre de points fixé</a></span>
+<br />   <span class="chapterToc" >3 <a 
+href="#x1-130003" id="QQ2-1-16">Amelioration de l&#8217;algorithme</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.1 <a 
+href="#x1-140003.1" id="QQ2-1-17">Arbres <span 
+class="cmmi-10">kd </span></a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >3.1.1 <a 
+href="#x1-150003.1.1" id="QQ2-1-18">Principe</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >3.1.2 <a 
+href="#x1-160003.1.2" id="QQ2-1-19">Performances</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.2 <a 
+href="#x1-170003.2" id="QQ2-1-20">Divide to Conquer : Union Find ?</a></span>
+<br />   <span class="chapterToc" >4 <a 
+href="#x1-180004" id="QQ2-1-21">Triangulation de Delaunay : Version finale</a></span>
+<br />   &#x00A0;<span class="sectionToc" >4.1 <a 
+href="#x1-190004.1" id="QQ2-1-22">Motivation</a></span>
+<br />   &#x00A0;<span class="sectionToc" >4.2 <a 
+href="#x1-200004.2" id="QQ2-1-23">Principe</a></span>
+<br />   &#x00A0;<span class="sectionToc" >4.3 <a 
+href="#x1-210004.3" id="QQ2-1-24">Performances</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >4.3.1 <a 
+href="#x1-220004.3.1" id="QQ2-1-25">Nombre de composantes connexes fixé : ditribution <span 
+class="eccc1000-"><span 
+class="small-caps">r</span><span 
+class="small-caps">a</span><span 
+class="small-caps">n</span><span 
+class="small-caps">d</span><span 
+class="small-caps">o</span><span 
+class="small-caps">m</span> </span>des points</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >4.3.2 <a 
+href="#x1-230004.3.2" id="QQ2-1-26">Nombre de composantes connexes fixé : Pire cas , Delaunay et Parabole</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >4.3.3 <a 
+href="#x1-240004.3.3" id="QQ2-1-27">Nombre de composantes connexes variable</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >4.3.4 <a 
+href="#x1-250004.3.4" id="QQ2-1-28">Graphe en 3D</a></span>
+   </div>
+                                                                                               
+
+                                                                                               
+   <h2 class="chapterHead"><span class="titlemark">Chapitre&#x00A0;1</span><br /><a 
+ id="x1-30001"></a>Élaboration de test et un premier algorithme naïf</h2>
+   <h3 class="sectionHead"><span class="titlemark">1.1   </span> <a 
+ id="x1-40001.1"></a>Élaboration de test</h3>
+<!--l. 139--><p class="noindent" >Pour évaluer les performances, il faut écrire un programme <span 
+class="eccc1000-"><span 
+class="small-caps">c</span><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span><span 
+class="small-caps">a</span><span 
+class="small-caps">t</span><span 
+class="small-caps">e</span><span 
+class="small-caps">_</span><span 
+class="small-caps">t</span><span 
+class="small-caps">e</span><span 
+class="small-caps">s</span><span 
+class="small-caps">t</span> </span>qui nous génère un fichier de
+points.
+<!--l. 142--><p class="indent" >   Or, on doit se poser la question : de quoi dépend le temps d&#8217;exécution de notre algorithme ? La réponse va constituer les
+entrées de notre programme <span 
+class="eccc1000-"><span 
+class="small-caps">c</span><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span><span 
+class="small-caps">a</span><span 
+class="small-caps">t</span><span 
+class="small-caps">e</span><span 
+class="small-caps">_</span><span 
+class="small-caps">t</span><span 
+class="small-caps">e</span><span 
+class="small-caps">s</span><span 
+class="small-caps">t</span></span>.
+<!--l. 146--><p class="indent" >   Notre algorithme dépend bien évidemment du nombre de points à étudier. Si on fixe le nombre de composantes connexe,
+on peut affirmer que notre algorithme ne dépend pas de la distance limite qui précise si deux points sont connectés ou
+non.
+<!--l. 151--><p class="indent" >   Enfin, il existe une dépendance vis-à-vis de distribution des points dans le plan. En effet même pour un nombre de
+points et un nombre de composantes connexes fixées, il existe plusieurs distributions de points possibles. Cependant on
+ne peut pas quantifier cette distribution de points mais on peut preciser dans notre algorithme la forme
+voulue.
+<!--l. 157--><p class="indent" >
+<!--l. 159--><p class="indent" >   Pour implémenter Create_test, l&#8217;idée est de fixer la distance à <span 
+class="cmr-10">1</span>.
+<!--l. 161--><p class="indent" >   Ensuite on repartie aléatoirement le nombre de points (nbre_de_point) sur le nombre de composantes
+connexes (nbre_de_cc). Par exemple nbre_de_point = <span 
+class="cmr-10">10 </span>et nbre_de_cc = <span 
+class="cmr-10">3 </span>une répartition possible est
+<span 
+class="cmr-10">[6</span><span 
+class="cmmi-10">,</span><span 
+class="cmr-10">3</span><span 
+class="cmmi-10">,</span><span 
+class="cmr-10">1]</span>.
+<!--l. 166--><p class="indent" >   On génère ensuite les points aléatoirement dans des « fenêtres » de taille <span 
+class="cmr-10">1 </span><span 
+class="cmsy-10">&#x00D7; </span><span 
+class="cmr-10">1 </span>et on translate ces fenêtres aléatoirement
+selon <span 
+class="cmmi-10">x </span>et <span 
+class="cmmi-10">y </span>d&#8217;un nombre pair pour éviter la collision entre fenêtre.
+<!--l. 170--><p class="indent" >   Avec python on a le programme suivant :
+   <!--l. 172--><div class="lstinputlisting">
+<a 
+ id="x1-4001"></a>
+<span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4002r1"></a></span><span 
+class="ectt-0900">import</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">random</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4003r2"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4004r3"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4005r4"></a></span><span 
+class="ectt-0900">def</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">create_test</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">nbre_de_point</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">nbre_cc</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4006r5"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4007r6"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">Create</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">a</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">file</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">of</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">points</span><span 
+class="ecit-0900">.</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4008r7"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4009r8"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4010r9"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_taille_cc</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">random</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">random</span><span 
+class="ectt-0900">()</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">_</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">range</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">nbre_cc</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">]</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4011r10"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">somme</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">sum</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">liste_taille_cc</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4012r11"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4013r12"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">range</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">len</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">liste_taille_cc</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4014r13"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_taille_cc</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">]</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">int</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">liste_taille_cc</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">]*</span><span 
+class="ectt-0900">nbre_de_point</span><span 
+class="ectt-0900">/</span><span 
+class="ectt-0900">somme</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4015r14"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4016r15"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_taille_cc</span><span 
+class="ectt-0900">[0]</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">+</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">nbre_de_point</span><span 
+class="ectt-0900">-</span><span 
+class="ectt-0900">sum</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">liste_taille_cc</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4017r16"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4018r17"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">fichier</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">open</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">"</span><span 
+class="ectt-0900">test_aux</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">pts</span><span 
+class="ectt-0900">"</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">"</span><span 
+class="ectt-0900">w</span><span 
+class="ectt-0900">"</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4019r18"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">print</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">"</span><span 
+class="ectt-0900">1</span><span 
+class="ectt-0900">"</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">file</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">fichier</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4020r19"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4021r20"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_fenetre</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">[]</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4022r21"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">range</span><span 
+class="ectt-0900">(0,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">nbre_cc</span><span 
+class="ectt-0900">+1,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">2)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4023r22"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">j</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">range</span><span 
+class="ectt-0900">(0,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">nbre_cc</span><span 
+class="ectt-0900">+1,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">2)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4024r23"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_fenetre</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">append</span><span 
+class="ectt-0900">((</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">j</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4025r24"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4026r25"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">taille</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_taille_cc</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4027r26"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">translation_x</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">translation_y</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">random</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">choice</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">liste_fenetre</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4028r27"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_fenetre</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">remove</span><span 
+class="ectt-0900">((</span><span 
+class="ectt-0900">translation_x</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">translation_y</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4029r28"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">_</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">range</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">taille</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4030r29"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">#</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">Ces</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">deux</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">lignes</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">permettent</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">de</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">choisir</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">la</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">distribution</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">des</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">points</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4031r30"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">#</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">dans</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">le</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">plan</span><span 
+class="ecit-0900">.</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">Ici</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">on</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">a</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">pris</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">une</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">distribution</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">aleatoire</span><span 
+class="ecit-0900">.</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4032r31"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">#</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">Celle</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">ci</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">va</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">etre</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">modifier</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">dans</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">la</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">suite</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">selon</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">les</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">cas</span><span 
+class="ecit-0900">.</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4033r32"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">x</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">random</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">random</span><span 
+class="ectt-0900">()</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">+</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">translation_x</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4034r33"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">y</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">random</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">random</span><span 
+class="ectt-0900">()</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">+</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">translation_y</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4035r34"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">print</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">x</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">"</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x2423;</span><span 
+class="ectt-0900">"</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">y</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">file</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">fichier</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4036r35"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4037r36"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-4038r37"></a></span><span 
+class="ectt-0900">create_test</span><span 
+class="ectt-0900">(20,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">5)</span>
+   </div>
+<!--l. 174--><p class="indent" >   Avec gnuplot le lancement du programme donne le fichier suivant :
+<div class="center" 
+>
+<!--l. 175--><p class="noindent" >
+<!--l. 176--><p class="noindent" ><img 
+src="1_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted1.png" alt="PIC"  
+width="43%" height="43%" >
+</div>
+<!--l. 179--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">1.2   </span> <a 
+ id="x1-50001.2"></a>Un premier algorithme naïf</h3>
+<!--l. 181--><p class="noindent" >Dans cette section, on va créer un premier algorithme naïf pour se donner une idée et visualiser. Une façon de faire et de
+calculer toutes les distances entre les points. Si c&#8217;est plus petit que la distance limite, on relie les deux points
+ensembles.
+<!--l. 186--><p class="indent" >   La fonction en python se traduit donc comme se suit.
+   <!--l. 188--><div class="lstinputlisting">
+<a 
+ id="x1-5001"></a>
+<span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5002r1"></a></span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5003r2"></a></span><span 
+class="ecit-0900">Algorithme</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">naive</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">pour</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">visualiser</span><span 
+class="ecit-0900">.</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5004r3"></a></span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5005r4"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5006r5"></a></span><span 
+class="ectt-0900">from</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">geo</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">segment</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">import</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">Segment</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5007r6"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5008r7"></a></span><span 
+class="ectt-0900">def</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">segment_connexe_impose</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5009r8"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5010r9"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">Return</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">a</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">list</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">of</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">segment</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">connected</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5011r10"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5012r11"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">result</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">[]</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5013r12"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">longueur</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">len</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5014r13"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">range</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">longueur</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5015r14"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">j</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">range</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">+1,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">longueur</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5016r15"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">if</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">].</span><span 
+class="ectt-0900">distance_to</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">j</span><span 
+class="ectt-0900">])</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x003C;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5017r16"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">seg</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">Segment</span><span 
+class="ectt-0900">([</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">],</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">j</span><span 
+class="ectt-0900">]])</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5018r17"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">result</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">append</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">seg</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-5019r18"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">return</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">result</span>
+   </div>
+<!--l. 190--><p class="indent" >   Le lancement du programme dans terminology avec tycat permet de visualiser les connexions pour le même fichier crée
+par notre <span 
+class="eccc1000-"><span 
+class="small-caps">c</span><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span><span 
+class="small-caps">a</span><span 
+class="small-caps">t</span><span 
+class="small-caps">e</span><span 
+class="small-caps">_</span><span 
+class="small-caps">t</span><span 
+class="small-caps">e</span><span 
+class="small-caps">s</span><span 
+class="small-caps">t</span> </span>dans la section 1.1
+                                                                                               
+
+                                                                                               
+<div class="center" 
+>
+<!--l. 193--><p class="noindent" >
+<!--l. 194--><p class="noindent" ><img 
+src="3_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_image_1_.png" alt="PIC"  
+width="28%" height="28%" >
+</div>
+<!--l. 197--><p class="indent" >   Une première remarque qu&#8217;on peut se faire, c&#8217;est qu&#8217;on calcule beaucoup de distance : il y a des distances inutiles. En
+effet, pour calculer la taille des composantes connexe, on n&#8217;a pas besoin de les calculer en &#8217;détails&#8217;. Cela est
+justifié par le faîte que s&#8217;il existe juste une liaison entre un point A et un sommet d&#8217;une composante connexe
+alors A appartient à cette composante connexe ; il est inutile de calculer la distance entre A et les sommets
+restants.
+<!--l. 205--><p class="indent" >   Pas besoin de faire une mesure de performance pour savoir que notre algorithme n&#8217;est pas efficace (surtout que notre
+algorithme ne fait que dessiner des segments et ne calcule pas la taille des composantes connexex)
+                                                                                               
+
+                                                                                               
+   <h2 class="chapterHead"><span class="titlemark">Chapitre&#x00A0;2</span><br /><a 
+ id="x1-60002"></a>Méthode DBSCAN naïve</h2>
+   <h3 class="sectionHead"><span class="titlemark">2.1   </span> <a 
+ id="x1-70002.1"></a>Principe</h3>
+<!--l. 214--><p class="noindent" >DBSCAN veut dire Density-Based Spatial Clustering of Applications with Noise. Étant donné un nombre de points, une
+distance et un seuil <span 
+class="cmmi-10">M </span>l&#8217;algorithme regroupe les points dans des Clusters s&#8217;il existe un chemin de chaque point à l&#8217;autre et si
+le nombre de points dans le Cluster est supérieur à <span 
+class="cmmi-10">M</span>.
+<!--l. 220--><p class="indent" >   <img 
+src="4_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted2.png" alt="PIC"  
+width="43%" height="43%" >
+<!--l. 222--><p class="indent" >   Dans le schéma les points en rouge A, c&#8217;est le Cluster. Les points en jaune C, B sont en train d&#8217;être découverts par le cluster. Le
+point bleu N est du bruit, car le nombre dans le Cluster contenant N est inférieur a M. Par la suite et pour répondre au problème
+posé, on fixe <!--l. 226--><p class="indent" >     <span 
+class="cmmi-10">M </span><span 
+class="cmr-10">= 1</span>                                                                                                                                         .
+<!--l. 228--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">2.2   </span> <a 
+ id="x1-80002.2"></a>Algorithme</h3>
+<!--l. 230--><p class="noindent" >Les etapes de l&#8217;algorithme avec <span 
+class="cmmi-10">M </span><span 
+class="cmr-10">= 1 </span>sont les suivantes :
+      <ul class="itemize1">
+      <li class="itemize">Entrée : <span 
+class="eccc1000-"><span 
+class="small-caps">p</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span><span 
+class="small-caps">n</span><span 
+class="small-caps">t</span><span 
+class="small-caps">s</span> </span>,une liste de points dans le plan, <span 
+class="eccc1000-"><span 
+class="small-caps">d</span><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">t</span><span 
+class="small-caps">a</span><span 
+class="small-caps">n</span><span 
+class="small-caps">c</span><span 
+class="small-caps">e</span><span 
+class="small-caps">,</span> </span>un nombre positif
+      </li>
+      <li class="itemize">Execution :
+         <ol  class="enumerate1" >
+         <li 
+  class="enumerate" id="x1-8002x1">On prend un point A au hasard de <span 
+class="eccc1000-"><span 
+class="small-caps">p</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span><span 
+class="small-caps">n</span><span 
+class="small-caps">t</span><span 
+class="small-caps">s</span></span>
+         </li>
+         <li 
+  class="enumerate" id="x1-8004x2">Si le point A n&#8217;a pas été visité :
+           <ul class="itemize2">
+           <li class="itemize">Marquer A comme visité
+           </li>
+           <li class="itemize">Initialiser un cluster <span 
+class="cmsy-10">{</span><span 
+class="cmmi-10">A</span><span 
+class="cmsy-10">}</span>
+           </li>
+           <li class="itemize">Calculer la liste <span 
+class="eccc1000-"><span 
+class="small-caps">v</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">i</span><span 
+class="small-caps">n</span> </span>du voisinage de A en utilisant <span 
+class="eccc1000-"><span 
+class="small-caps">d</span><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">t</span><span 
+class="small-caps">a</span><span 
+class="small-caps">n</span><span 
+class="small-caps">c</span><span 
+class="small-caps">e</span></span>
+           </li>
+           <li class="itemize">Pour chaque point <span 
+class="cmmi-10">V </span>de <span 
+class="eccc1000-"><span 
+class="small-caps">v</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">i</span><span 
+class="small-caps">n</span> </span>:
+              <ul class="itemize3">
+              <li class="itemize">Trouver les cluster en partant de <span 
+class="cmmi-10">V </span>en marquant les points comme visités
+              </li>
+              <li class="itemize">Unir les cluster avec ce lui de <span 
+class="cmsy-10">{</span><span 
+class="cmmi-10">A</span><span 
+class="cmsy-10">}</span></li></ul>
+           </li></ul>
+         </li>
+         <li 
+  class="enumerate" id="x1-8006x3">Retourner la liste de Cluster obtenue</li></ol>
+      </li>
+      <li class="itemize">Fin</li></ul>
+<!--l. 254--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">2.3   </span> <a 
+ id="x1-90002.3"></a>Implementation dans Python</h3>
+<!--l. 256--><p class="noindent" >On a décidé d&#8217;implémenter l&#8217;algorithme de façon itérative et en l&#8217;adaptant pour qu&#8217;il renvoie directement la taille des
+clusters.
+<!--l. 259--><p class="indent" >   Les fonctions sont donc :
+   <!--l. 261--><div class="lstinputlisting">
+<a 
+ id="x1-9001"></a>
+<span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9002r1"></a></span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9003r2"></a></span><span 
+class="ecit-0900">Methode</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">dbscan</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">iterative</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9004r3"></a></span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9005r4"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9006r5"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9007r6"></a></span><span 
+class="ectt-0900">def</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">recherche_voisin</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">un_point</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9008r7"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9009r8"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">Recherche</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">les</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">voisins</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">de</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">un_point</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">dans</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">la</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">liste</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">points</span><span 
+class="ecit-0900">.</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9010r9"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9011r10"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisinage</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">[]</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9012r11"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">des_points</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9013r12"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">if</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">0</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x003C;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">un_point</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">distance_to</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">des_points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x003C;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9014r13"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisinage</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">append</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">des_points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9015r14"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">return</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisinage</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9016r15"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9017r16"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9018r17"></a></span><span 
+class="ectt-0900">def</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">etendre_cluster</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">cluster</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">un_point</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9019r18"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9020r19"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">Etend</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">le</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">cluster</span><span 
+class="ecit-0900">.</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9021r20"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9022r21"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisin</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">recherche_voisin</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">un_point</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9023r22"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">0</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9024r23"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">while</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x003C;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">len</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">voisin</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9025r24"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">if</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisin</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">]</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">not</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">Visited</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9026r25"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">Visited</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">add</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">voisin</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">])</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9027r26"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisin_prime</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">recherche_voisin</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisin</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">],</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9028r27"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisin</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisin</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">+</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">voisin_prime</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9029r28"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">cluster</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">add</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">voisin</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">])</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9030r29"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">+</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">1</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9031r30"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9032r31"></a></span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9033r32"></a></span><span 
+class="ectt-0900">def</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">DBScan</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9034r33"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9035r34"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">Implemente</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">la</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">methode</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">DBscan</span><span 
+class="ecit-0900">.</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9036r35"></a></span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">&#x00A0;</span><span 
+class="ecit-0900">"""</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9037r36"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">global</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">Visited</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9038r37"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">Visited</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">set</span><span 
+class="ectt-0900">()</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9039r38"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">global</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_cluster</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9040r39"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_cluster</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">[]</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9041r40"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">for</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">range</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">len</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9042r41"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">if</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">]</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">not</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">in</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">Visited</span><span 
+class="ectt-0900">:</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9043r42"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">Visited</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">add</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">])</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9044r43"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">cluster</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">=</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">{</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">]}</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9045r44"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">etendre_cluster</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">cluster</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">distance</span><span 
+class="ectt-0900">,</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">[</span><span 
+class="ectt-0900">i</span><span 
+class="ectt-0900">],</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">points</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9046r45"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_cluster</span><span 
+class="ectt-0900">.</span><span 
+class="ectt-0900">append</span><span 
+class="ectt-0900">(</span><span 
+class="ectt-0900">cluster</span><span 
+class="ectt-0900">)</span><span 
+class="ectt-0900">&#x00A0;</span><br /><span class="label"><a 
+ id="x1-9047r46"></a></span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">return</span><span 
+class="ectt-0900">&#x00A0;</span><span 
+class="ectt-0900">liste_cluster</span>
+                                                                                               
+
+                                                                                               
+   </div>
+<!--l. 263--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">2.4   </span> <a 
+ id="x1-100002.4"></a>Performances</h3>
+<!--l. 265--><p class="noindent" >L&#8217;algorithme présenté dans 2.3 possède plusieurs problèmes. Cependant on remarque que ce qui influe le plus sur la
+complexité et le temps d&#8217;exécution c&#8217;est la fonction <span 
+class="eccc1000-"><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span><span 
+class="small-caps">c</span><span 
+class="small-caps">h</span><span 
+class="small-caps">e</span><span 
+class="small-caps">r</span><span 
+class="small-caps">c</span><span 
+class="small-caps">h</span><span 
+class="small-caps">e</span><span 
+class="small-caps">_</span><span 
+class="small-caps">v</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">i</span><span 
+class="small-caps">n</span><span 
+class="small-caps">.</span></span>
+<!--l. 269--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">2.4.1   </span> <a 
+ id="x1-110002.4.1"></a>Nombre de composantes connexes fixé</h4>
+<!--l. 271--><p class="noindent" >En fixant le nombre de composantes connexes à 3, et en ne variant que le nombre de points dans le <span 
+class="eccc1000-"><span 
+class="small-caps">c</span><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span><span 
+class="small-caps">a</span><span 
+class="small-caps">t</span><span 
+class="small-caps">e</span><span 
+class="small-caps">_</span><span 
+class="small-caps">t</span><span 
+class="small-caps">e</span><span 
+class="small-caps">s</span><span 
+class="small-caps">t</span> </span>(Voir
+1.1) on obtient les courbes de performances suivantes.
+<div class="center" 
+>
+<!--l. 274--><p class="noindent" >
+<!--l. 275--><p class="noindent" ><img 
+src="6_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_A___ique_Projet_Algo_Rapport_dbscan_itera_cfc=3.png" alt="PIC"  
+width="43%" height="43%" >
+</div>
+<!--l. 278--><p class="indent" >   On remarque que notre meilleur cas commence à avoir l&#8217;allure d&#8217;une droite pour des valeurs plus grande que 3 000
+points. Dans le pire cas, la courbe a l&#8217;air en <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">n</span><sup><span 
+class="cmmi-7">&#x03B1;</span></sup><span 
+class="cmr-10">) </span>avec <span 
+class="cmmi-10">&#x03B1; &#x003E; </span><span 
+class="cmr-10">1 </span>(on se doute évidemment que <span 
+class="cmmi-10">&#x03B1; </span><span 
+class="cmr-10">= 2</span>).
+<!--l. 283--><p class="indent" >   Pour fixer les idées, nous allons considérer la complexité en moyenne. Pour cela, on reprend les mesures précédentes
+et on remplace chaque groupe de points alignés verticalement par un point correspondant a la moyenne
+arithmétique.
+<div class="center" 
+>
+<!--l. 287--><p class="noindent" >
+<!--l. 288--><p class="noindent" ><img 
+src="7_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted4.png" alt="PIC"  
+width="36%" height="36%" >   <img 
+src="8_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted5.png" alt="PIC"  
+width="36%" height="36%" >
+</div>
+<!--l. 292--><p class="indent" >   La régression linéaire donne un coefficient de corrélation de 0,99. On a donc bien une droite. On en déduit de <span 
+class="cmmi-10">B </span><span 
+class="cmr-10">= 1</span><span 
+class="cmmi-10">.</span><span 
+class="cmr-10">94</span>
+que le cas moyen est en <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">n</span><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span>.
+<div class="center" 
+>
+<!--l. 295--><p class="noindent" >
+<!--l. 296--><p class="noindent" ><img 
+src="9_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted3.png" alt="PIC"  
+width="28%" height="28%" >
+</div>
+<!--l. 299--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">2.4.2   </span> <a 
+ id="x1-120002.4.2"></a>Nombre de points fixé</h4>
+<!--l. 301--><p class="noindent" >À présent, on fixe le nombre de points à 2000. Ce qui varie, c&#8217;est le nombre de composantes connexes. Les performances sont
+affichées ci-dessous avec le cas moyen.
+<div class="center" 
+>
+<!--l. 304--><p class="noindent" >
+<!--l. 305--><p class="noindent" ><img 
+src="10_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted6.png" alt="PIC"  
+width="36%" height="36%" >  <img 
+src="11_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted7.png" alt="PIC"  
+width="36%" height="36%" >
+</div>
+                                                                                               
+
+                                                                                               
+<!--l. 308--><p class="indent" >   On remarque l&#8217;existence d&#8217;une valeur critique minimale tel qu&#8217;après cette valeur le temps est un <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">k</span><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">) </span>avec <span 
+class="cmmi-10">k </span>le nombre
+de composantes connexes. En effet, pour un grand nombre de composantes connexes ou un nombre de composantes petit
+l&#8217;algorithme devient couteux.
+                                                                                               
+
+                                                                                               
+   <h2 class="chapterHead"><span class="titlemark">Chapitre&#x00A0;3</span><br /><a 
+ id="x1-130003"></a>Amelioration de l&#8217;algorithme</h2>
+   <h3 class="sectionHead"><span class="titlemark">3.1   </span> <a 
+ id="x1-140003.1"></a>Arbres <span 
+class="cmmi-10">kd </span></h3>
+<!--l. 317--><p class="noindent" >Comme on a pu le remarquer précédemment le problème vient principalement de la fonction qui recherche le voisinage d&#8217;un
+point donné. Pour résoudre cela, il faut trouver une manière plus rapide et plus efficace de calculer le voisinage d&#8217;un
+point.
+<!--l. 322--><p class="indent" >   L&#8217;idée est de combiner l&#8217;algorithme précèdent avec une autre fonction <span 
+class="eccc1000-"><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span><span 
+class="small-caps">c</span><span 
+class="small-caps">h</span><span 
+class="small-caps">e</span><span 
+class="small-caps">r</span><span 
+class="small-caps">c</span><span 
+class="small-caps">h</span><span 
+class="small-caps">e</span><span 
+class="small-caps">_</span><span 
+class="small-caps">v</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">i</span><span 
+class="small-caps">n</span> </span>qui utilise les Arbres Kd
+pour calculer plus rapidement le voisinage.
+<!--l. 326--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">3.1.1   </span> <a 
+ id="x1-150003.1.1"></a>Principe</h4>
+<!--l. 328--><p class="noindent" >L&#8217;arbre <span 
+class="cmmi-10">kd </span>est comme son nom l&#8217;indique une structure de donné qui permet de partitionner l&#8217;espace avec des points de <span 
+class="cmmi-10">k</span>
+dimension. Dans la suite, on confondra les arbres <span 
+class="cmmi-10">kd </span>et les arbres <span 
+class="cmr-10">2</span><span 
+class="cmmi-10">d</span>.
+<!--l. 332--><p class="indent" >   Chaque point divise l&#8217;espace en deux sous-espaces. Pour simplifier l&#8217;explication plaçons nous dans un plan. Un point
+<span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">p</span></sub><span 
+class="cmmi-10">,y</span><sub><span 
+class="cmmi-7">p</span></sub><span 
+class="cmr-10">) </span>divise le plan selon Oy. Les points <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x,y</span><span 
+class="cmr-10">) </span>d&#8217;ordonné tel que <span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">p</span></sub> <span 
+class="cmmi-10">&#x003E; x </span>sont stockés dans la branche gauche de l&#8217;arbre kd
+et les points <span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">p</span></sub> <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">x </span>dans la branche droite. Le prochain point <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">p</span></sub><span 
+class="cmsy-10">&#x2032;</span><span 
+class="cmmi-10">,y</span><sub><span 
+class="cmmi-7">p</span></sub><span 
+class="cmsy-10">&#x2032;</span><span 
+class="cmr-10">) </span>divisera le plan selon Ox et ainsi de
+suite.
+<!--l. 339--><p class="indent" >   Étant donné un nuage de points <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmmi-10">,y</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmr-10">) </span>il y a plusieurs moyens de choisir les points qui divisent l&#8217;espace _splitting
+point_ dans notre arbre : on choisit la méthode tel que chaque splitting point possède la médiane comme
+coordonnée selon x ou y. Les points donnés sont donc les feuilles de l&#8217;arbre inséré selon les règles mentionné
+ci-dessus.
+<!--l. 346--><p class="indent" >   Appliquons cette construction à notre exemple de la section <span 
+class="cmr-10">1</span><span 
+class="cmmi-10">.</span><span 
+class="cmr-10">1 </span>:
+<div class="center" 
+>
+<!--l. 348--><p class="noindent" >
+<!--l. 349--><p class="noindent" ><img 
+src="12_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_arbrekd.png" alt="PIC"  
+width="43%" height="43%" >
+</div>
+<!--l. 352--><p class="indent" >   Ainsi, cette structure permet d&#8217;éviter de calculer la distance entre les points éloignés.
+<!--l. 355--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">3.1.2   </span> <a 
+ id="x1-160003.1.2"></a>Performances</h4>
+<!--l. 357--><p class="noindent" >Même si j&#8217;avais une structure d&#8217;arbres <span 
+class="cmmi-10">kd </span>qui fonctionne j&#8217;ai décidé d&#8217;arrêter cette approche. En effet, même si cette idée
+va fonctionner, le codage en python s&#8217;avère particulièrement pénible. Cependant à titre de comparaison avec l&#8217;algorithme
+ou le recherche de voisinage se fait de manière brut je fournie une comparaison entre les deux avec l&#8217;option <span 
+class="eccc1000-"><span 
+class="small-caps">c</span><span 
+class="small-caps">p</span><span 
+class="small-caps">r</span><span 
+class="small-caps">o</span><span 
+class="small-caps">f</span><span 
+class="small-caps">i</span><span 
+class="small-caps">l</span><span 
+class="small-caps">e</span> </span>de
+python3.
+<!--l. 364--><p class="indent" >   Le module <span 
+class="eccc1000-"><span 
+class="small-caps">s</span><span 
+class="small-caps">c</span><span 
+class="small-caps">i</span><span 
+class="small-caps">p</span><span 
+class="small-caps">y</span><span 
+class="small-caps">.</span><span 
+class="small-caps">s</span><span 
+class="small-caps">p</span><span 
+class="small-caps">a</span><span 
+class="small-caps">t</span><span 
+class="small-caps">i</span><span 
+class="small-caps">a</span><span 
+class="small-caps">l</span> </span>nous fourni une fonction calcul de voisinage faite avec Python.
+<div class="center" 
+>
+<!--l. 366--><p class="noindent" >
+<!--l. 367--><p class="noindent" ><hr class="figure"><div class="figure" 
+> <a 
+ id="x1-16001r1"></a> <img 
+src="13_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_profile_kd.png" alt="PIC"  
+width="28%" height="28%" >
+ <span 
+class="ecrm-0800">(a)</span>
+ <span 
+class="ecrm-0800">Algorithme</span>
+ <span 
+class="ecrm-0800">avec</span>
+ <span 
+class="ecrm-0800">Arbre</span>
+ <span 
+class="cmmi-8">kd</span>
+<a 
+ id="x1-16002r2"></a>
+                                                                                               
+
+                                                                                               
+<!--l. 380--><p class="noindent" > <img 
+src="14_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted8.png" alt="PIC"  
+width="28%" height="28%" >
+<span 
+class="ecrm-0800">(b)</span>
+<span 
+class="ecrm-0800">Algorithme</span>
+<span 
+class="ecrm-0800">sans</span>
+<span 
+class="ecrm-0800">Arbre</span>
+<span 
+class="cmmi-8">kd</span>
+<a 
+ id="x1-16003r1"></a>
+<a 
+ id="x1-16004"></a>
+<br />                                                                                               <div class="caption" 
+><span class="id">
+<span 
+class="eccc1000-"><span 
+class="small-caps">f</span><span 
+class="small-caps">i</span><span 
+class="small-caps">g</span><span 
+class="small-caps">u</span><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span></span><span 
+class="eccc1000-">&#x00A0;<span 
+class="small-caps">3</span><span 
+class="small-caps">.</span><span 
+class="small-caps">1</span><span 
+class="small-caps">.</span><span 
+class="small-caps">1</span> </span>&#8211; </span><span  
+class="content">Profile de Dbscan avec Arbre kd (a) et par recherche brute (b)
+</span></div><!--tex4ht:label?: x1-16003r3.1 -->
+<!--l. 383--><p class="noindent" ></div><hr class="endfigure">
+</div>
+<!--l. 386--><p class="indent" >   Ainsi l&#8217;utilisation des arbres <span 
+class="cmmi-10">kd </span>permet de réduire significativement le temps de l&#8217;algorithme. En effet, sur les figures, on
+voit que ca passe de <span 
+class="cmr-10">97% </span>a <span 
+class="cmr-10">25%</span>. Sans oublier que le calcul de la distance avec <span 
+class="eccc1000-"><span 
+class="small-caps">d</span><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">t</span><span 
+class="small-caps">a</span><span 
+class="small-caps">n</span><span 
+class="small-caps">c</span><span 
+class="small-caps">e</span><span 
+class="small-caps">_</span><span 
+class="small-caps">t</span><span 
+class="small-caps">o</span> </span>(fonction fournie dans le
+module <span 
+class="eccc1000-"><span 
+class="small-caps">g</span><span 
+class="small-caps">e</span><span 
+class="small-caps">o</span></span>) n&#8217;est pas le plus rapide <span 
+class="cmr-10">(80</span><span 
+class="cmmi-10">.</span><span 
+class="cmr-10">15%)</span>.
+<!--l. 392--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">3.2   </span> <a 
+ id="x1-170003.2"></a>Divide to Conquer : Union Find ?</h3>
+<!--l. 394--><p class="noindent" >L&#8217;utilisation améliore potentiellement la complexité dans certains cas et rend le programme plus rapide.
+Cependant la complexité moyenne reste la même : en effet même si on sait calculer le voisinage d&#8217;un point plus
+efficacement, pour répondre au problème il faut trouver les voisins de chaque point et revenir au principe d&#8217;un
+DBSCAN en marquant si le point a été visité ou non. Ainsi, la complexité est en <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">) </span>toujours (<span 
+class="cmmi-10">N </span>nombre de
+points).
+<!--l. 402--><p class="indent" >   Une méthode d&#8217;améliorer est de faire un diviser pour régner. Dans notre cas, diviser est simple : soit avec des Arbres Kd
+de nouveau ou avec une division en &#8217;petit carré&#8217; de l&#8217;espace. Pour retrouver le résultat final une structure nommée Union
+Find sera utile.
+<!--l. 407--><p class="indent" >   La compléxité de notre algorithme sera dans quelque cas en <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">Nlog</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><span 
+class="cmr-10">)) </span>(<span 
+class="cmmi-10">N </span>nombre de points).
+<!--l. 410--><p class="indent" >   Cependant si on a un nombre <span 
+class="cmmi-10">N </span>tres grands et un nombre de composantw connexe <span 
+class="cmmi-10">CC </span>petit (mais non égal a 1) cette
+approche ne sera plus efficace :
+<div class="center" 
+>
+<!--l. 413--><p class="noindent" >
+<!--l. 414--><p class="noindent" ><img 
+src="15_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted10.png" alt="PIC"  
+width="36%" height="36%" >
+</div>
+<!--l. 417--><p class="indent" >   En effet dans la figure de dessus, on a deux ensembles de points en mauve. Si <span 
+class="cmmi-10">d </span><span 
+class="cmr-10">= 0</span><span 
+class="cmmi-10">.</span><span 
+class="cmr-10">5 </span>on aura deux composantes
+connexes. Dans ce cas (cas non-rare et fréquent) notre algorithme est en <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span>. Une manière de s&#8217;en convaincre est de
+penser comme se suit :
+      <ul class="itemize1">
+      <li class="itemize">un diviser pour régner normale forme les deux composantes connexe en mauve
+      </li>
+      <li class="itemize">L&#8217;algorithme doit ensuite calculer la distance entre chaque couple de points de chaque composante connexes
+      pour savoir s&#8217;il les unit dans une seule composante. La réponse étant non-car <span 
+class="cmmi-10">d </span><span 
+class="cmr-10">= 0</span><span 
+class="cmmi-10">.</span><span 
+class="cmr-10">5 </span>on va calculer toutes
+      les distances entre couples de points. Cela explique la complexité.</li></ul>
+<!--l. 430--><p class="noindent" >Pour cette raison, je n&#8217;ai pas développé un algorithme avec Union Find même s&#8217;il est plausible de résoudre ce cas particulier en
+regardant le barycentre par exemple ...
+                                                                                               
+
+                                                                                               
+   <h2 class="chapterHead"><span class="titlemark">Chapitre&#x00A0;4</span><br /><a 
+ id="x1-180004"></a>Triangulation de Delaunay : Version finale</h2>
+   <h3 class="sectionHead"><span class="titlemark">4.1   </span> <a 
+ id="x1-190004.1"></a>Motivation</h3>
+<!--l. 438--><p class="noindent" >Le problème avec les versions précédentes, c&#8217;est qu&#8217;on commence à chercher depuis tout l&#8217;ensemble de points. Un
+prétraitement des points pourra être utile pour qu&#8217;on ne regarde qu&#8217;un sous-ensemble de relations entre les points donnés.
+L&#8217;idée est de faire le lien avec le cours de recherche opérationnelle.
+<!--l. 444--><p class="indent" >   Pour cela, notons notre ensemble de points <span 
+class="cmmi-10">V </span>. On imagine qu&#8217;on les lie tous (même si en pratique, on ne va pas faire ca).
+On aura un ensemble d&#8217;arêtes <span 
+class="cmmi-10">E</span>. A chaque arête de <span 
+class="cmmi-10">E </span>on lui associe son coût comme étant sa longueur euclidienne. On
+défini alors le graphe <span 
+class="cmmi-10">G </span><span 
+class="cmr-10">= (</span><span 
+class="cmmi-10">V,E</span><span 
+class="cmr-10">)</span>.
+   <div class="newtheorem">
+<!--l. 449--><p class="noindent" ><span class="head">
+<a 
+ id="x1-19001r1"></a>
+<span 
+class="ecbx-1000">D</span><span 
+class="ecbx-1000">éfinition 1.</span>  </span>Un arbre couvrant minimum euclidien ou <span 
+class="ecbx-1000">EMST </span>est un arbre couvrant minimum pour un graphe
+dont le coût des arêtes est la distance euclidienne
+   </div>
+<!--l. 453--><p class="indent" >
+<!--l. 455--><p class="indent" >   L&#8217;idée est de chercher les composantes connexes dans l&#8217;<span 
+class="ecbx-1000">EMST </span>du graphe. En effet on a la proprieté suivante sur les
+arbres couvrants :
+   <div class="newtheorem">
+<!--l. 458--><p class="noindent" ><span class="head">
+<a 
+ id="x1-19002r2"></a>
+<span 
+class="ecbx-1000">Proposition 2.</span>  </span><span 
+class="ecti-1000">Les composantes connexes sont incluses dans l&#8217;</span><span 
+class="ecbi-1000">EMST </span><span 
+class="ecti-1000">du graphe </span><span 
+class="cmmi-10">G</span>
+   </div>
+<!--l. 461--><p class="indent" >
+<!--l. 463--><p class="indent" >
+   <div class="proof">
+<!--l. 464--><p class="indent" >   <span class="head">
+<span 
+class="ecti-1000">D</span><span 
+class="ecti-1000">émonstration.</span> </span><span 
+class="ecti-1000">(pseudo preuve)</span>
+<!--l. 466--><p class="indent" >   Sois une arête <span 
+class="cmmi-10">e</span><sub><span 
+class="cmmi-7">i</span></sub> de l&#8217;EMST. On note <span 
+class="cmmi-10">C </span>le cycle formé par cette arête et d&#8217;autres arêtes non-présentes dans
+l&#8217;EMST. En se rappelant que l&#8217;EMST est un arbre couvrant minimum, une propriété qu&#8217;il possède est que chaque
+arête de <span 
+class="cmmi-10">C </span>possède une longueur supérieure à celle de <span 
+class="cmmi-10">e</span><sub><span 
+class="cmmi-7">i</span></sub>.
+<!--l. 472--><p class="indent" >   On en déduit que : s&#8217;il existe un chemin dans <span 
+class="cmmi-10">G </span>tel que toute arête possède une longueur inférieur a <span 
+class="cmmi-10">d</span><sub><span 
+class="cmmi-7">max</span></sub> alors
+il y a un chemin dans l&#8217;EMST avec cette même propriété
+<!--l. 476--><p class="indent" >   Fin de la Preuve                                                                                                                          __
+   </div>
+<!--l. 479--><p class="indent" >   La question reste comment trouver un <span 
+class="ecbx-1000">EMST </span>du graphe. Pour cela, on utilise un théorème fondamental dans ce
+projet.
+   <div class="newtheorem">
+<!--l. 481--><p class="noindent" ><span class="head">
+<a 
+ id="x1-19003r3"></a>
+<span 
+class="ecbx-1000">Th</span><span 
+class="ecbx-1000">éor</span><span 
+class="ecbx-1000">ème 3.</span>  </span><span 
+class="ecti-1000">L&#8217;EMST est inclus dans la </span><span 
+class="ecbi-1000">triangulation de Delaunay </span><span 
+class="ecti-1000">du graphe </span><span 
+class="cmmi-10">G</span>
+                                                                                               
+
+                                                                                               
+   </div>
+<!--l. 484--><p class="indent" >
+<!--l. 487--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">4.2   </span> <a 
+ id="x1-200004.2"></a>Principe</h3>
+<!--l. 489--><p class="noindent" >La <span 
+class="ecbx-1000">triangulation de Delaunay </span>est une triangulation (relie les points pour former des triangles) telle que chaque point P
+du graphe soit à l&#8217;extérieur de tous les cercles circonscrits aux triangles de la triangulation.
+<!--l. 494--><p class="indent" >   La construction de la triangulation de Delaunay utilise un calcul de déterminant pour savoir si le point est
+à l&#8217;extérieur au cercle circonscrit ou non. L&#8217;implémentation est difficile et nécessite un algorithme diviser
+pour régner et de nombreuses astuces (flipping algorithm : on génère une triangulation et on flip les arêtes
+pour avoir une de Delaunay). Cependant le module <span 
+class="eccc1000-"><span 
+class="small-caps">s</span><span 
+class="small-caps">c</span><span 
+class="small-caps">i</span><span 
+class="small-caps">p</span><span 
+class="small-caps">y</span><span 
+class="small-caps">.</span><span 
+class="small-caps">s</span><span 
+class="small-caps">p</span><span 
+class="small-caps">a</span><span 
+class="small-caps">t</span><span 
+class="small-caps">i</span><span 
+class="small-caps">a</span><span 
+class="small-caps">l</span> </span>propose de faire une triangulation de
+Delaunay.
+<!--l. 502--><p class="indent" >   Le principe de l&#8217;algorithme est donc le suivant :
+      <ol  class="enumerate1" >
+      <li 
+  class="enumerate" id="x1-20002x1">On génère la triangulation de Delaunay <span 
+class="cmmi-10">D</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">G</span><span 
+class="cmr-10">) </span>du graphe <span 
+class="cmmi-10">G</span>
+      </li>
+      <li 
+  class="enumerate" id="x1-20004x2">On crée un graphe <span 
+class="cmmi-10">G</span><span 
+class="cmsy-10">&#x2032; </span>représenté en python par un dictionnaire
+      </li>
+      <li 
+  class="enumerate" id="x1-20006x3">On parcourt les triangles de <span 
+class="cmmi-10">D</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">G</span><span 
+class="cmr-10">) </span>et on calcul la longueur <span 
+class="cmmi-10">&#x2113; </span>des côtés des triangles :
+         <ol  class="enumerate2" >
+         <li 
+  class="enumerate" id="x1-20008x1">Si <span 
+class="cmmi-10">&#x2113; </span><span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">d</span><sub><span 
+class="cmmi-7">max</span></sub> on ajoute les deux extrémités dans <span 
+class="cmmi-10">G</span><span 
+class="cmsy-10">&#x2032;</span>
+         </li>
+         <li 
+  class="enumerate" id="x1-20010x2">Sinon on continue</li></ol>
+      </li>
+      <li 
+  class="enumerate" id="x1-20012x4">On fait un <span 
+class="cmmi-10">dfs </span>(depth first search ou parcours en profondeur) sur <span 
+class="cmmi-10">G</span><span 
+class="cmsy-10">&#x2032; </span>pour avoir les composantes connexes</li></ol>
+<!--l. 515--><p class="noindent" >L&#8217;algorithme est illustré par le schéma suivant :
+<!--l. 517--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+                                                                                               
+
+                                                                                               
+                                                                                               
+
+                                                                                               
+<!--l. 519--><p class="noindent" ><img 
+src="16_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_delaunay.png" alt="PIC"  
+width="43%" height="43%" >
+<a 
+ id="x1-20013r1"></a>
+<a 
+ id="x1-20014"></a>
+<br />                                                                                               <div class="caption" 
+><span class="id">
+<span 
+class="eccc1000-"><span 
+class="small-caps">f</span><span 
+class="small-caps">i</span><span 
+class="small-caps">g</span><span 
+class="small-caps">u</span><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span></span><span 
+class="eccc1000-">&#x00A0;<span 
+class="small-caps">4</span><span 
+class="small-caps">.</span><span 
+class="small-caps">2</span><span 
+class="small-caps">.</span><span 
+class="small-caps">1</span> </span>&#8211; </span><span  
+class="content">Principe de la solution avec la triangulation de Delaunay
+</span></div><!--tex4ht:label?: x1-20013r4.2 -->
+                                                                                               
+
+                                                                                               
+<!--l. 523--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 525--><p class="indent" >   Dans l&#8217;Étape 1, on vous montre les points, dans l&#8217;Étape 2 on fait la triangulation de Delaunay sur ces points, dans
+l&#8217;Étape 3, on enlève les segments de longueur plus grande que <span 
+class="cmmi-10">d</span><sub><span 
+class="cmmi-7">max</span></sub> et dans l&#8217;Étape 4, on fait le parcourt en profondeur sur
+le graphe.
+   <h3 class="sectionHead"><span class="titlemark">4.3   </span> <a 
+ id="x1-210004.3"></a>Performances</h3>
+<!--l. 533--><p class="noindent" >On commence par donner une propriété utile :
+   <div class="newtheorem">
+<!--l. 534--><p class="noindent" ><span class="head">
+<a 
+ id="x1-21001r4"></a>
+<span 
+class="ecbx-1000">Proposition 4.</span>  </span><span 
+class="ecti-1000">La triangulation de Delaunay de </span><span 
+class="cmmi-10">N </span><span 
+class="ecti-1000">points dans le plan contient </span><span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><span 
+class="cmr-10">) </span><span 
+class="ecti-1000">triangles.</span>
+   </div>
+<!--l. 537--><p class="indent" >
+<!--l. 541--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">4.3.1   </span> <a 
+ id="x1-220004.3.1"></a>Nombre de composantes connexes fixé : ditribution <span 
+class="eccc1000-"><span 
+class="small-caps">r</span><span 
+class="small-caps">a</span><span 
+class="small-caps">n</span><span 
+class="small-caps">d</span><span 
+class="small-caps">o</span><span 
+class="small-caps">m</span> </span>des points</h4>
+<!--l. 543--><p class="noindent" >Dans cette partie, on fixe le nombre de composantes connexes. On fait varier le nombre de points. La distribution des points
+dans le plan est considérée à ce stade aléatoire. Les coordonnées <span 
+class="cmmi-10">x </span>et <span 
+class="cmmi-10">y </span>sont générées avec <span 
+class="eccc1000-"><span 
+class="small-caps">r</span><span 
+class="small-caps">a</span><span 
+class="small-caps">n</span><span 
+class="small-caps">d</span><span 
+class="small-caps">o</span><span 
+class="small-caps">m</span><span 
+class="small-caps">.</span><span 
+class="small-caps">r</span><span 
+class="small-caps">a</span><span 
+class="small-caps">n</span><span 
+class="small-caps">d</span><span 
+class="small-caps">o</span><span 
+class="small-caps">m</span><span 
+class="small-caps">(</span><span 
+class="small-caps">)</span> </span>de
+python3.
+<div class="center" 
+>
+<!--l. 547--><p class="noindent" >
+<!--l. 548--><p class="noindent" ><img 
+src="17_home_almounah_Desktop_ENSIMAG_1A_Semestre_2____que_Projet_Algo_Rapport_delaunay_perf_50cfc.png" alt="PIC"  
+width="36%" height="36%" > <img 
+src="18_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted11.png" alt="PIC"  
+width="36%" height="36%" >
+</div>
+<!--l. 552--><p class="indent" >   Même si les points semblent être parfaitement alignés la complexité est en <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">Nlog</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><span 
+class="cmr-10">))</span>. En effet le temps d&#8217;exécution <span 
+class="cmmi-10">T</span>
+de notre algorithme s&#8217;écrit comme :
+<!--l. 556--><p class="indent" >   <span 
+class="cmmi-10">T </span><span 
+class="cmr-10">=</span> <img 
+src="rapport0x.png" alt="a &#x00D7; Nlog(N)
+&#x25DF;----&#x25DD;&#x25DC;---&#x25DE;" ><sub>chercher la triangulation de Delaunay</sub> <span 
+class="cmr-10">+</span> <img 
+src="rapport1x.png" alt="b &#x00D7; O(N )
+&#x25DF;---&#x25DD;&#x25DC;--&#x25DE;" ><sub>Parcourir les triangles et enlever les points éloignés</sub> <span 
+class="cmr-10">+</span>
+<img 
+src="rapport2x.png" alt="     O(N&#x25DC;)&#x25DE; a&#x25DF;r&#x25DD;êtes N s&#x25DC;om&#x25DE;m&#x25DF;e&#x25DD;ts
+c&#x00D7; O(   N    +    N    )
+&#x25DF;----------&#x25DD;&#x25DC;----------&#x25DE;" ><sub>Parcours en profondeur</sub>
+<!--l. 558--><p class="indent" >
+<!--l. 560--><p class="indent" >   <span 
+class="ecbx-1000">RQ : </span>On a <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><span 
+class="cmr-10">) </span>arêtes d&#8217;après la proposition 4
+<!--l. 562--><p class="indent" >   Cependant et vu la distribution aléatoire des points, chercher la triangulation de Delaunay se fait rapidement. Ainsi, on
+a <span 
+class="cmmi-10">b &#x003E;&#x003E; a </span>ou <span 
+class="cmmi-10">c &#x003E;&#x003E; a</span>. Il est difficile de voir alors le <span 
+class="cmmi-10">Nlog</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><span 
+class="cmr-10">)</span>.
+<!--l. 566--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">4.3.2   </span> <a 
+ id="x1-230004.3.2"></a>Nombre de composantes connexes fixé : Pire cas , Delaunay et Parabole</h4>
+<!--l. 568--><p class="noindent" >On cherche maintenant a faire en sorte que le <span 
+class="cmmi-10">a </span>de la section précédente domine. Si tel est le cas on pourra voir un
+<span 
+class="cmmi-10">NlogN</span>.
+<!--l. 571--><p class="indent" >   Pour cela utilisons le théorème suivant :
+   <div class="newtheorem">
+<!--l. 572--><p class="noindent" ><span class="head">
+<a 
+ id="x1-23001r5"></a>
+                                                                                               
+
+                                                                                               
+<span 
+class="ecbx-1000">Th</span><span 
+class="ecbx-1000">éor</span><span 
+class="ecbx-1000">ème 5.</span>  </span><span 
+class="ecti-1000">Le pire cas du calcul de la triangulation de Delaunay, sans diviser pour r</span><span 
+class="ecti-1000">égner, est en </span><span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span><span 
+class="ecti-1000">. </span><span 
+class="cmmi-10">N</span>
+<span 
+class="ecti-1000">étant le nombre de point.</span>
+<!--l. 576--><p class="indent" >   <span 
+class="ecti-1000">Ce pire cas est r</span><span 
+class="ecti-1000">éalis</span><span 
+class="ecti-1000">é quand les points sont sur le m</span><span 
+class="ecti-1000">ême cot</span><span 
+class="ecti-1000">é d&#8217;une parabole. Donc on a affaire </span><span 
+class="ecti-1000">à des points de</span>
+<span 
+class="ecti-1000">la forme :</span>
+<!--l. 579--><p class="indent" >   <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">1</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmr-7">1</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span><span 
+class="cmmi-10">,</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">2</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmr-7">2</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span><span 
+class="cmmi-10">,...,</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">N</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmmi-7">N</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">) </span><span 
+class="ecti-1000">avec les </span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub> <span 
+class="ecti-1000">de m</span><span 
+class="ecti-1000">ême signes.</span>
+   </div>
+<!--l. 581--><p class="indent" >
+<!--l. 583--><p class="indent" >
+   <div class="proof">
+<!--l. 584--><p class="indent" >   <span class="head">
+<span 
+class="ecti-1000">D</span><span 
+class="ecti-1000">émonstration.</span> </span><span 
+class="ecti-1000">(pseudo preuve)</span>
+<!--l. 586--><p class="indent" >   On trie les points par abscisse croissante. <span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">1</span></sub> <span 
+class="cmmi-10">&#x003C; x</span><sub><span 
+class="cmr-7">2</span></sub><span 
+class="cmmi-10">... &#x003C; x</span><sub><span 
+class="cmmi-7">N</span></sub>. Cela est possible, car on a un nombre fini de points.
+<!--l. 589--><p class="indent" >   On suppose que la triangulation de Delaunay a été faite pour <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span><span 
+class="cmr-7">+1</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmmi-7">i</span><span 
+class="cmr-7">+1</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span><span 
+class="cmmi-10">,</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span><span 
+class="cmr-7">+2</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmmi-7">i</span><span 
+class="cmr-7">+2</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span><span 
+class="cmmi-10">,...,</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">N</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmmi-7">N</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span>. On la
+note <span 
+class="cmmi-10">D</span><sub><span 
+class="cmmi-7">i</span><span 
+class="cmr-7">+1</span></sub>. On veut ajouter <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmmi-7">i</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">) </span>à cette triangulation <span 
+class="cmmi-10">D</span><sub><span 
+class="cmmi-7">i</span><span 
+class="cmr-7">+1</span></sub>.
+<!--l. 593--><p class="indent" >   Pour cela considérons <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B1;,&#x03B2;,&#x03B3;</span><span 
+class="cmr-10">) </span><span 
+class="cmsy-10">&#x2208; {</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmr-7">1</span></sub><span 
+class="cmmi-10">,...,x</span><sub><span 
+class="cmmi-7">i</span><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">1</span></sub><span 
+class="cmsy-10">}</span><sup><span 
+class="cmr-7">3</span></sup> tel que <span 
+class="cmmi-10">&#x03B1; &#x003C; &#x03B2; &#x003C; &#x03B3;</span>. Soit <span 
+class="cmmi-10">C</span>le cercle circonscrit au triangle de
+sommet <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B1;,&#x03B2;,&#x03B3;</span><span 
+class="cmr-10">)</span>.
+<!--l. 597--><p class="indent" >   Le point <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmmi-7">i</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">) </span>est dans <span 
+class="cmmi-10">C </span>ssi <span 
+class="cmmi-10">V </span><span 
+class="cmr-10">= </span><span 
+class="cmmi-10">det</span><span 
+class="cmr-10">(</span><img 
+src="rapport3x.png" alt="&#x230A;         2   2   4 &#x230B;
+  1  &#x03B1;   &#x03B1;2  &#x03B1;2+ &#x03B1;4
+|| 1  &#x03B2;   &#x03B2;2  &#x03B2;2+ &#x03B2;4 ||
+&#x2308; 1  &#x03B3;   &#x03B3;2  &#x03B3;2+ &#x03B3;4 &#x2309;
+  1  xi  xi  xi + xi"  class="left" align="middle"><span 
+class="cmr-10">) = 0</span>.
+<!--l. 604--><p class="indent" >   Le calcul avec la calculatrice donne <span 
+class="cmmi-10">V </span><span 
+class="cmr-10">= (</span><span 
+class="cmmi-10">&#x03B1;</span><span 
+class="cmr-10">+</span><span 
+class="cmmi-10">&#x03B2; </span><span 
+class="cmr-10">+</span><span 
+class="cmmi-10">&#x03B3; </span><span 
+class="cmr-10">+</span><span 
+class="cmmi-10">t</span><span 
+class="cmr-10">)</span><span 
+class="cmsy-10">&#x00D7;</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B1;</span><span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">&#x03B2;</span><span 
+class="cmr-10">)</span><span 
+class="cmsy-10">&#x00D7;</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B1;</span><span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmr-10">)</span><span 
+class="cmsy-10">&#x00D7;</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B1;</span><span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">&#x03B3;</span><span 
+class="cmr-10">)</span><span 
+class="cmsy-10">&#x00D7;</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B2;</span><span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">&#x03B3;</span><span 
+class="cmr-10">)</span><span 
+class="cmsy-10">&#x00D7;</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B2;</span><span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmr-10">)</span><span 
+class="cmsy-10">&#x00D7;</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B3;</span><span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">t</span><span 
+class="cmr-10">)</span>
+<!--l. 606--><p class="indent" >   Vu que les points sont distincts on a <span 
+class="cmmi-10">V</span> <span 
+class="cmmi-10">&#x2260;</span><span 
+class="cmr-10">0</span>. Les <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">&#x03B1;,&#x03B2;,&#x03B3;</span><span 
+class="cmr-10">) </span>étant quelconque, on en déduit que <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmmi-7">i</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">) </span>est à
+l&#8217;extérieur de tout cercle circonscrit aux triangles de la triangulation. Ajouter le point <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x</span><sub><span 
+class="cmmi-7">i</span></sub><span 
+class="cmmi-10">,x</span><sub><span 
+class="cmmi-7">i</span></sub><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">) </span>ajoute donc <span 
+class="cmmi-10">N </span><span 
+class="cmsy-10">- </span><span 
+class="cmmi-10">i</span>
+cotés à la triangulation <span 
+class="cmmi-10">D</span><sub><span 
+class="cmmi-7">i</span><span 
+class="cmr-7">+1</span></sub>.
+<!--l. 612--><p class="indent" >   Ainsi passer de la triangulation <span 
+class="cmmi-10">D</span><sub><span 
+class="cmmi-7">N</span></sub> à <span 
+class="cmmi-10">D</span><sub><span 
+class="cmmi-7">i</span></sub> nécessite l&#8217;ajout de <span 
+class="cmex-10">&#x2211;</span>
+  <sub><span 
+class="cmmi-7">i</span><span 
+class="cmr-7">=1</span></sub><sup><span 
+class="cmmi-7">N</span></sup><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N </span><span 
+class="cmsy-10">- </span><span 
+class="cmmi-10">i</span><span 
+class="cmr-10">) = </span><span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span><span 
+class="cmmi-10">. </span>C&#8217;est d&#8217;ici dont vient
+notre complexité quadratique.
+<!--l. 616--><p class="indent" >   Fin de la preuve                                                                                                                          __
+   </div>
+<!--l. 618--><p class="indent" >   On présente une illustration graphique du théorème :
+<div class="center" 
+>
+<!--l. 619--><p class="noindent" >
+<!--l. 620--><p class="noindent" ><img 
+src="19_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_preuve.png" alt="PIC"  
+width="36%" height="36%" >
+</div>
+<!--l. 623--><p class="indent" >   Dans notre test, il suffit alors lors de la génération des points aléatoires de créer aléatoirement une abscisse <span 
+class="cmmi-10">x </span>et en
+déduire <span 
+class="cmmi-10">y </span><span 
+class="cmr-10">= </span><span 
+class="cmmi-10">x</span><sup><span 
+class="cmr-7">2</span></sup> par exemple.
+<!--l. 627--><p class="indent" >   Le théorème 4 assure que la complexité de la création de la triangulation sera en <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><sup><span 
+class="cmr-7">2</span></sup><span 
+class="cmr-10">)</span> s&#8217;il n&#8217;y a pas de diviser
+pour régner. Cependant l&#8217;algorithme de <span 
+class="eccc1000-"><span 
+class="small-caps">s</span><span 
+class="small-caps">c</span><span 
+class="small-caps">i</span><span 
+class="small-caps">p</span><span 
+class="small-caps">y</span><span 
+class="small-caps">.</span><span 
+class="small-caps">s</span><span 
+class="small-caps">p</span><span 
+class="small-caps">a</span><span 
+class="small-caps">t</span><span 
+class="small-caps">i</span><span 
+class="small-caps">a</span><span 
+class="small-caps">l</span> </span>utilise un diviser pour régner avec de nombreuses
+astuces. La complexité sera alors en <span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">NlogN</span><span 
+class="cmr-10">)</span>. On fixe le nombre de composantes fortement connexes (<span 
+class="cmmi-10">cfc</span>) à
+2.
+<div class="center" 
+>
+<!--l. 633--><p class="noindent" >
+<!--l. 634--><p class="noindent" >10000, nbre_de_point) start = time.<img 
+src="20_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted15.png" alt="PIC"  
+width="36%" height="36%" >   <img 
+src="21_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted16.png" alt="PIC"  
+width="36%" height="36%" >
+</div>
+                                                                                               
+
+                                                                                               
+<!--l. 637--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">4.3.3   </span> <a 
+ id="x1-240004.3.3"></a>Nombre de composantes connexes variable</h4>
+<!--l. 639--><p class="noindent" >Dans cette partie, on fait varier le nombre de composantes connexes. Dans un premier temps, fixons le nombre de points a
+50 000.
+<!--l. 642--><p class="indent" >   La force de cet algorithme avec la triangulation de Delaunay, c&#8217;est qu&#8217;il est indépendant du nombre de composantes
+connexes.
+<!--l. 645--><p class="indent" >   En effet, la fonction pour calculer la triangulation de Delaunay ne dépend que du nombre de points et leur distribution
+dans le plan.
+<!--l. 648--><p class="indent" >   La fonction qui enlève les points éloignés ne dépend que du nombre de triangles formé par la triangulation de
+Delaunay.
+<!--l. 651--><p class="indent" >   Le parcours en profondeur dépend du nombre de sommets (<span 
+class="cmr-10">= </span><span 
+class="cmmi-10">N</span>) et du nombre d&#8217;arêtes. (<span 
+class="cmr-10">= </span><span 
+class="cmmi-10">O</span><span 
+class="cmr-10">(</span><span 
+class="cmmi-10">N</span><span 
+class="cmr-10">) </span>(proposition
+4)).
+<!--l. 654--><p class="indent" >   <img 
+src="22_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted17.png" alt="PIC"  
+width="36%" height="36%" >   <img 
+src="23_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted18.png" alt="PIC"  
+width="36%" height="36%" >
+<!--l. 657--><p class="indent" >   En faisant varier à nouveau le nombre de points, on peut aussi tracer un schéma comme celui de dessus pour s&#8217;en
+convaincre.
+<div class="center" 
+>
+<!--l. 659--><p class="noindent" >
+<!--l. 660--><p class="noindent" ><img 
+src="24_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted19.png" alt="PIC"  
+width="43%" height="43%" >
+</div>
+<!--l. 663--><p class="indent" >   On peut remarquer l&#8217;entremêlement des points vers <span 
+class="cmr-10">40000 </span>puis l&#8217;inversion de l&#8217;ordre de ces points vers
+<span 
+class="cmr-10">70000</span>.
+<!--l. 666--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">4.3.4   </span> <a 
+ id="x1-250004.3.4"></a>Graphe en 3D</h4>
+<!--l. 668--><p class="noindent" >Une représentation possible est en 3D en faisant varier le nombre de points et le nombre de composantes fortement
+connexes (cfc) en même temps.
+<div class="center" 
+>
+<!--l. 671--><p class="noindent" >
+<!--l. 672--><p class="noindent" ><img 
+src="25_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted20.png" alt="PIC"  
+width="39%" height="39%" ><img 
+src="26_home_almounah_Desktop_ENSIMAG_1A_Semestre_2_Algorithmique_Projet_Algo_Rapport_pasted21.png" alt="PIC"  
+width="39%" height="39%" >
+</div>
+<!--l. 675--><p class="indent" >   En projection sur le plan, on voit des lignes horizontales. Cela rejoint l&#8217;idée d&#8217;un temps constant en fonction du nombre
+de composantes connexes.  
+</body></html> 
+
+                                                                                               
+
+

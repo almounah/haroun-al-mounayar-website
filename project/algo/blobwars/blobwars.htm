@@ -1,0 +1,76 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blobwars</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        h1{
+            text-align: center;
+            text-decoration: underline;
+        }
+
+        p {
+            width: 90%;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: gold;
+        }
+
+        img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            background-color: DodgerBlue;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            cursor: pointer;
+            font-size: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            text-decoration: none;
+            text-align: center;
+            
+        }
+
+        .btn:hover {
+            background-color: RoyalBlue;
+            
+        }
+
+        body {
+            background-color: paleturquoise;
+        }
+
+    </style>
+</head>
+<body>
+    <h1> Blobwars </h1>
+    <main>
+        <p>
+            Le plateau contient des pions (également appelés blobs) bleus et rouges. On joue chacun son tour. À chaque tour le joueur courant choisit un de ses pions et le déplace. Tout pion 
+            peut se déplacer sur une case adjacente vide, y compris en diagonale, en se dupliquant
+             et créant ainsi un nouveau pion de même couleur. Un pion peut 
+             également se déplacer de deux cases, c'est à dire max(∆ligne,∆colonne) = 2. Dans ce cas, 
+             il n'y a pas de duplication et on dit que le pion fait un "saut". Une fois arrivé sur 
+             sa destination un pion transforme tous les pions voisins de son adversaire en pions de
+              sa propre couleur. Le jeu s’arrête dès qu’un joueurne peut pas jouer. Le joueur ayant 
+              le plus de pion sur le plateau remporte alors la partie.
+        </p>
+
+        <img src="blob.png" alt="No image">
+        <br>
+        <button class="btn"  onclick="window.location.href='blobwars.py';">
+            <i class="fa fa-download"></i> 
+            Download code .py
+        </button>
+    </main>
+</body>
+</html>

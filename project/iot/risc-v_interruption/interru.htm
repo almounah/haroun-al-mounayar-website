@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Interruption of RISC-V</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        @media (max-width: 1000px) {
+            .img {
+                width: 100%;
+                height: auto;
+            }
+        }
+        .btn {
+            background-color: DodgerBlue;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            cursor: pointer;
+            font-size: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            text-decoration: none;
+            text-align: center;
+            
+        }
+
+        .btn:hover {
+            background-color: RoyalBlue;
+            
+        }
+
+    </style>
+</head>
+<body>
+    <h1> Gestion des interruptions d'un RISC-V en VHDL</h1>
+    <main>
+        <article>
+            <p>
+                Fondamentalement, le processeur dispose de registres supplémentaires, appelés 
+                Registres de contrôle et d'état, alias CSR, qui sont utilisés pour maintenir un
+                 état critique, tel que le PC interrompu, le niveau de privilège interrompu et 
+                 la cause de l'interruption, etc. De plus, les CSR contiennent la configuration 
+                 d'interruption, dont un élément d'état est l'adresse de la table de vecteurs d'interruption, 
+                 ainsi que le niveau 
+                de privilège actuel, et plus encore, comme s'il s'exécute en mode 32 bits ou plus.
+
+                L'objectif est d'implementer dans la partie opérative une composantes CPU_CSR qui 
+                s'occupe des interruptions.
+            </p>
+            <img class=img src="interrup.png" alt="No photo">
+        </article>
+        <button class="btn"  onclick="window.location.href='CPU_CSR.vhd';">
+            <i class="fa fa-download"></i> 
+            Download Code in VHDL
+        </button>
+
+        <p> (PS : This is not the complete project, there are files and libraries i can provide on request if needed.)</p>
+    </main>
+    
+</body>
+</html>
