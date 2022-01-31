@@ -1,42 +1,57 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Programming</title>
-    <link rel="stylesheet" href="algo_style.css">
-
-</head>
-<body>
-    <button class = "button_project" onclick="window.location.href='../project_index.htm';">
-        Projects
-    </button> 
-    <br>
-    <input type=text id=search_bar onkeyup="search_func()" placeholder="Search for a project ...">
-    <ul id = list>
-        <li><a href="cfc_delaunay/rapport.html"> Finding the size of the connex components in an unoriented 2D graph </a></li>
-        <li><a href="blobwars/blobwars.htm"> Blobwars with Python + code </a></li>
-        <li><a href="stat_vent/stat.html">Statistique de la vitesse du vent avec R</a></li>
+    <link rel="stylesheet" href="algo_style.css" />
+  </head>
+  <body>
+    <button
+      class="button_project"
+      onclick="window.location.href='../project_index.htm';"
+    >
+      Projects
+    </button>
+    <br />
+    <input
+      type="text"
+      id="search_bar"
+      onkeyup="search_func()"
+      placeholder="Search for a project ..."
+    />
+    <ul id="list">
+      <li>
+        <a href="cfc_delaunay/rapport.html">
+          Finding the size of the connex components in an unoriented 2D graph
+        </a>
+      </li>
+      <li><a href="blobwars/blobwars.htm"> Blobwars with Python + code </a></li>
+      <li>
+        <a href="stat_vent/stat.html"
+          >Statistique de la vitesse du vent avec R</a
+        >
+      </li>
     </ul>
-    
+
     <script>
-        function search_func() {
-          var input, filter, ul, li, a, i, txtValue;
-          input = document.getElementById('search_bar');
-          filter = input.value.toUpperCase();
-          ul = document.getElementById("list");
-          li = ul.getElementsByTagName('li');
-        
-          for (i = 0; i < li.length; i++) {
-            a = li[i].getElementsByTagName("a")[0];
-            txtValue = a.textContent || a.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-              li[i].style.display = "";
-            } else {
-              li[i].style.display = "none";
-            }
+      function search_func() {
+        var input, filter, ul, li, a, i, txtValue;
+        input = document.getElementById("search_bar");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("list");
+        li = ul.getElementsByTagName("li");
+
+        for (i = 0; i < li.length; i++) {
+          a = li[i].getElementsByTagName("a")[0];
+          txtValue = a.textContent || a.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+          } else {
+            li[i].style.display = "none";
           }
         }
-        </script>
-</body>
+      }
+    </script>
+  </body>
 </html>

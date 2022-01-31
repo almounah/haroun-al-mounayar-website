@@ -1,66 +1,69 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
     <title>Jumps in RISC-V</title>
     <style>
-        h1 {
-            text-align: center;
-        }
+      h1 {
+        text-align: center;
+      }
 
-        @media (max-width: 1000px) {
-            .img {
-                width: 100%;
-                height: auto;
-            }
+      @media (max-width: 1000px) {
+        .img {
+          width: 100%;
+          height: auto;
         }
-        .btn {
-            background-color: DodgerBlue;
-            border: none;
-            color: white;
-            padding: 12px 30px;
-            cursor: pointer;
-            font-size: 20px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            text-decoration: none;
-            text-align: center;
-            
-        }
+      }
+      .btn {
+        background-color: DodgerBlue;
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        cursor: pointer;
+        font-size: 20px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        text-decoration: none;
+        text-align: center;
+      }
 
-        .btn:hover {
-            background-color: RoyalBlue;
-            
-        }
-
+      .btn:hover {
+        background-color: RoyalBlue;
+      }
     </style>
-</head>
-<body>
-    <h1> Gestion des sauts d'un RISC-V en VHDL</h1>
+  </head>
+  <body>
+    <h1>Gestion des sauts d'un RISC-V en VHDL</h1>
     <main>
-        <article>
-            <p>
-                Le processeur dispose de fonctionnalité supplémentaires qui sont utilisés pour 
-                faire des sauts. Cela est fondamentale car il permet la création de boucle 'while' et 'for' ainsi
-                que de 'if'.
-                En assembleur, cela ce traduit par la possibilité de 'sauter' entre les lignes.
-                L'objectif est d'implementer dans la partie opérative une composantes CPU_CND qui 
-                s'occupe des sauts.
-            </p>
-            <img class=img src="jump.png" alt="No photo">
-            <br>
-        </article>
-        <br>
-        <button class="btn"  onclick="window.location.href='CPU_CND.vhd';">
-            <i class="fa fa-download"></i> 
-            Download Code in VHDL
-        </button>
+      <article>
+        <p>
+          Le processeur dispose de fonctionnalité supplémentaires qui sont
+          utilisés pour faire des sauts. Cela est fondamentale car il permet la
+          création de boucle 'while' et 'for' ainsi que de 'if'. En assembleur,
+          cela ce traduit par la possibilité de 'sauter' entre les lignes.
+          L'objectif est d'implementer dans la partie opérative une composantes
+          CPU_CND qui s'occupe des sauts.
+        </p>
+        <img class="img" src="jump.png" alt="No photo" />
+        <br />
+      </article>
+      <br />
+      <button class="btn" onclick="window.location.href='CPU_CND.vhd';">
+        <i class="fa fa-download"></i>
+        Download Code in VHDL
+      </button>
 
-        <p color=red> (PS : This is not the complete project, there are files and libraries i can provide on request if needed.)</p>
+      <p color="red">
+        (PS : This is not the complete project, there are files and libraries i
+        can provide on request if needed.)
+      </p>
     </main>
-    
-</body>
+  </body>
 </html>
+
