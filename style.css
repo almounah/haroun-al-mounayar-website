@@ -1,190 +1,178 @@
 #body {
-    background-image: url('head.jpg');
-    background-color: darksalmon;
-    background-repeat: no-repeat;  
-    background-size: 100% 300px;
+  background-image: url("head.jpg");
+  background-color: darksalmon;
+  background-repeat: no-repeat;
+  background-size: 100% 300px;
 }
 @media (max-width: 1000px) {
-
-    #body {
-        background-size: 100% 15%;
-    }
-
+  #body {
+    background-size: 100% 15%;
+  }
 }
-
 
 #head {
-    color: darkgrey;
-    text-align: center;
-    margin-top: 85px;
-    font-style: italic;
+  color: darkgrey;
+  text-align: center;
+  margin-top: 85px;
+  font-style: italic;
 }
 
-@media  (max-width: 1000px) {
-    #head {
-        margin-top: 3px;
-        font-size: 1.2em;
-        color: white;
-    }
+@media (max-width: 1000px) {
+  #head {
+    margin-top: 3px;
+    font-size: 1.2em;
+    color: white;
+  }
 }
-
 
 #me {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 110px;
-    border-radius: 50px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 110px;
+  border-radius: 50px;
 }
-@media  (max-width: 1000px) {
-    #me {
-        size: 1em;
-        width: 150px;
-        height: auto;
-        margin-top: 0%;
-    }
+@media (max-width: 1000px) {
+  #me {
+    size: 1em;
+    width: 150px;
+    height: auto;
+    margin-top: 0%;
+  }
 }
-
 
 #button_bar {
-    background-image: url('barscroll.png');
-    background-color: darksalmon;
-    background-repeat: no-repeat;
-    background-position: right;
-    background-size: 150px, 50px;
-    background-blend-mode: screen;
-    text-align: center;
-
+  background-image: url("barscroll.png");
+  background-color: darksalmon;
+  background-repeat: no-repeat;
+  background-position: right;
+  background-size: 150px, 50px;
+  background-blend-mode: screen;
+  text-align: center;
 }
-@media  (max-width: 1000px) {
-    #button_bar {
-        background-size: 30px, 20px;
-    }
+@media (max-width: 1000px) {
+  #button_bar {
+    background-size: 30px, 20px;
+  }
 }
 
 .button_of_current_page {
-    background-color: gray;
-    border-color: darkslategrey;
-    font-weight: 800;
-    height: 50px;
-    width: 150px;
-    border-radius: 20px;
-    cursor: not-allowed;
+  background-color: gray;
+  border-color: darkslategrey;
+  font-weight: 800;
+  height: 50px;
+  width: 150px;
+  border-radius: 20px;
+  cursor: not-allowed;
 }
 
 .button_home {
-    background-color: darkorchid;
-    border-color: darkviolet;
-    height: 50px;
-    width: 150px;
-    color: white;
-    border-radius: 20px;
-    transition-duration: 0.4s;
+  background-color: darkorchid;
+  border-color: darkviolet;
+  height: 50px;
+  width: 150px;
+  color: white;
+  border-radius: 20px;
+  transition-duration: 0.4s;
 }
 
 .button_home:hover {
-    background-color: rgb(255, 255, 255);
-    color: darkorchid;
+  background-color: rgb(255, 255, 255);
+  color: darkorchid;
 }
 
 .button_home:active {
-    text-decoration: underline;
-    
+  text-decoration: underline;
 }
 .button_project {
-    background-color: green;
-    border-color: darkgreen;
-    height: 50px;
-    width: 150px;
-    color: white;
-    border-radius: 20px;
-    transition-duration: 0.4s;
-    cursor: pointer;
+  background-color: green;
+  border-color: darkgreen;
+  height: 50px;
+  width: 150px;
+  color: white;
+  border-radius: 20px;
+  transition-duration: 0.4s;
+  cursor: pointer;
 }
 
 .button_project:hover {
-    background-color: rgb(255, 255, 255);
-    color: green;
+  background-color: rgb(255, 255, 255);
+  color: green;
 }
 
 .button_project:active {
-    text-decoration: underline;
-    
+  text-decoration: underline;
 }
 .button_github {
-    background-color: red;
-    border-color: darkred;
-    height: 50px;
-    width: 150px;
-    color: white;
-    border-radius: 20px;
-    transition-duration: 0.4s;
-    cursor: pointer;
+  background-color: red;
+  border-color: darkred;
+  height: 50px;
+  width: 150px;
+  color: white;
+  border-radius: 20px;
+  transition-duration: 0.4s;
+  cursor: pointer;
 }
 
 .button_github:hover {
-    background-color: rgb(255, 255, 255);
-    color: red;
+  background-color: rgb(255, 255, 255);
+  color: red;
 }
 
 .button_github:active {
-    text-decoration: underline;
-    
+  text-decoration: underline;
 }
 
-
 .button_contact {
-    background-color: yellow;
-    border-color: darkorange;
-    height: 50px;
-    width: 150px;
-    color: black;
-    border-radius: 20px;
-    transition-duration: 0.4s;
-    cursor: pointer;
+  background-color: yellow;
+  border-color: darkorange;
+  height: 50px;
+  width: 150px;
+  color: black;
+  border-radius: 20px;
+  transition-duration: 0.4s;
+  cursor: pointer;
 }
 
 .button_contact:hover {
-    background-color: rgb(255, 255, 255);
-    border-color: darkorange;
-    color: black;
+  background-color: rgb(255, 255, 255);
+  border-color: darkorange;
+  color: black;
 }
 
 .button_contact:active {
-    text-decoration: underline;
-
+  text-decoration: underline;
 }
 
-@media  (max-width: 1000px) {
-    .button_contact {
-        height: 35px;
-        width: 70px;
-        font-size: 8px;
-    }
+@media (max-width: 1000px) {
+  .button_contact {
+    height: 35px;
+    width: 70px;
+    font-size: 8px;
+  }
 
-    .button_home {
-        height: 35px;
-        width: 70px;
-        font-size: 8px;
-    }
+  .button_home {
+    height: 35px;
+    width: 70px;
+    font-size: 8px;
+  }
 
-    .button_github {
-        height: 35px;
-        width: 70px;
-        font-size: 8px;
-    }
+  .button_github {
+    height: 35px;
+    width: 70px;
+    font-size: 8px;
+  }
 
-    .button_project {
-        height: 35px;
-        width: 70px;
-        font-size: 8px;
-    }
+  .button_project {
+    height: 35px;
+    width: 70px;
+    font-size: 8px;
+  }
 
-    .button_of_current_page {
-        height: 35px;
-        width: 70px;
-        font-size: 8px;
-        color: black;
-    }
+  .button_of_current_page {
+    height: 35px;
+    width: 70px;
+    font-size: 8px;
+    color: black;
+  }
 }
-
