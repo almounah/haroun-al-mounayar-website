@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="GENERATOR" content="LyX 2.3.6" />
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<title>HDLC frame and Wireshark</title>
+<style type='text/css'>
+/* Layout-provided Styles */
+del.strikeout {
+  text-decoration: line-through;
+}
+h1.title {
+font-size: x-large;
+margin-bottom: 1ex;
+text-align: center;
+
+}
+div.standard {
+	margin-bottom: 2ex;
+}
+h2.section {
+font-weight: bold;
+font-size: x-large;
+margin-top: 1.3ex;
+margin-bottom: 0.7ex;
+text-align: left;
+
+}
+h3.subsection {
+font-weight: bold;
+font-size: large;
+margin-top: 0.9ex;
+margin-bottom: 0.5ex;
+text-align: left;
+
+}
+div.plain_layout {
+text-align: left;
+
+}
+ul.itemize {
+margin-top: 0.7ex;
+margin-bottom: 0.7ex;
+margin-left: 3ex;
+text-align: left;
+
+}
+div.float-listings {
+	border: 2px solid black;
+	padding: 1ex;
+	margin: 1ex;
+}
+div.listings-caption {
+	text-align: center;
+	border: 2px solid black;
+	padding: 1ex;
+	margin: 1ex;
+	}
+
+
+</style>
+</head>
+<body dir="auto">
+<h1 class="title" id='magicparlabel-1'><u>HDLC frame and Wireshark</u></h1>
+<div class="standard" id='magicparlabel-3580'>Wireshark is the best tool to capture traffic (after tcpdump of course) on a network. However the traffic show by wireshark is not always the real one circulating physically. In this article we will see how Wireshark hides the escaping mechanism on HDLC-like protocols and we show a way to actually see the real frame.</div>
+<h2 class="section" id='magicparlabel-2'><span class="section_label">1</span> Brief review of HDLC</h2>
+<div class="standard" id='magicparlabel-3'>High-Level Data Link Control (HDLC) is a protocol used to transmit synchronous data between nodes. It is a layer 2 (data link) protocol according to the OSI model.</div>
+
+<div class="standard" id='magicparlabel-4'>In this article we will use HDLC with a serial line between two desktop computers. </div>
+
+<div class="standard" id='magicparlabel-5'><u><b>NB:</b></u> A serial line usually uses one pin for transmission and one pin for reception. While this is suitable for a console, it is very not enough for protocols like PPP. This is why a modem is used to be able to accomplish data link.</div>
+<h3 class="subsection" id='magicparlabel-6'><span class="subsection_label">1.1</span> Basic Frame</h3>
+<div class="standard" id='magicparlabel-7'>The frame PPP in HDLC-like frame looks like :</div>
+
+
+<div class='float-listings'><pre class ='listings VHDL'>+----------+----------+----------+            
+|   Flag   | Address  | Control  |            
+| 01111110 | 11111111 | 00000011 |            
++----------+----------+----------+            
++----------+-------------+---------+            
+| Protocol | Information | Padding |            
+| 8/16 bits|      *      |    *    |            
++----------+-------------+---------+            
++----------+----------+-----------------            
+|   FCS    |   Flag   | Inter-frame Fill            
+|16/32 bits| 01111110 | or next Address            
++----------+----------+----------------- </pre></div>
+
+
+<div class="standard" id='magicparlabel-19'>According to the rfc1662 :</div>
+
+<ul class="itemize" id='magicparlabel-20'><li class="itemize_item">Flag Sequence : Each frame begins and ends with a Flag Sequence, which is the binary sequence 01111110 (hexadecimal 0x7e).</li>
+<li class="itemize_item">The Address field is a single octet, which contains the binary sequence 11111111</li>
+<li class="itemize_item">The Control field is a single octet, which contains the binary sequence 00000011 (hexadecimal 0x03)</li>
+<li class="itemize_item">The Frame Check Sequence field defaults to 16 bits (two octets)</li>
+</ul>
+<h3 class="subsection" id='magicparlabel-24'><span class="subsection_label">1.2</span> Escaping characters</h3>
+<div class="standard" id='magicparlabel-25'>A very legitimate question rises from the frame. A frame is delimited by two flags : 01111110. <u>What if the information section contains a flag ?</u></div>
+
+<div class="standard" id='magicparlabel-26'>To counter this problem an escape mechanism exists. For example, if inside the information section we have a flag, it is replaced by <u>0x7d, 0x5e</u>, in hexa. And thus the received frame will contain the stuffing bits that will be removed after reception.</div>
+
+<div class="standard" id='magicparlabel-27'>Now, what if the information contains an escaping character ? Well, there is an escaping mechanism for the escaping mechanism. It is well detailled in the rfc1662.</div>
+<h2 class="section" id='magicparlabel-28'><span class="section_label">2</span> Setting up the connection and visualising with wireshark</h2>
+<h3 class="subsection" id='magicparlabel-29'><span class="subsection_label">2.1</span> Verifying the connection with tip</h3>
+<div class="standard" id='magicparlabel-30'>We are using freebds linux on two computers connected by a serial link.</div>
+
+<div class="standard" id='magicparlabel-31'>We open a terminal in each computer and we run :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>tip cuau0c</pre></div>
+
+
+<div class="standard" id='magicparlabel-37'>What we see is that we have a console opened on each PC, lets call them PC1 and PC2. When we write on the console on PC1, it appears on the console on PC2 without writing anything on PC1.</div>
+
+<div class="standard" id='magicparlabel-375'>The serial line is well established.</div>
+<h3 class="subsection" id='magicparlabel-399'><span class="subsection_label">2.2</span> Setting up and pinging with PPP</h3>
+<div class="standard" id='magicparlabel-406'>We choose one PC to be the server and the other one to be the client.</div>
+
+<div class="standard" id='magicparlabel-456'>On the client we use vim to create a file <u>/etc/ppp/ppp.conf</u> containing :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>default:
+  set device /dev/cuau0
+  set speed 9600
+  set timeout 0
+  set accmap 00000000</pre></div>
+
+
+<div class="standard" id='magicparlabel-549'>On the server we create a file <u>/etc/ppp/ppp.conf</u> containing :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>default:
+  set device /dev/cuau0
+  set speed 9600
+  set timeout 0
+  set accmap 00000000
+  set ifaddr 10.0.0.1 10.0.0.2 255.255.255.255</pre></div>
+
+
+<div class="standard" id='magicparlabel-644'>Now we have set up everything for the PPP to work : the speed, the interface the ip adresses...</div>
+
+<div class="standard" id='magicparlabel-846'>On the server we run in a terminal :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>ppp</pre></div>
+
+
+<div class="standard" id='magicparlabel-950'>A console pop up with a terminal showing three &ldquo;p&rdquo; in lower case. Lower case means there is no connection yet.</div>
+
+<div class="standard" id='magicparlabel-970'>In this console we write <u>&ldquo;term</u>&rdquo;. The console will go in terminal mode and wait.</div>
+
+<div class="standard" id='magicparlabel-1018'>On the client we run in a terminal :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>ppp</pre></div>
+
+
+<div class="standard" id='magicparlabel-1026'>We have the same console we saw on the server. This time we initiate the connection by writing <u>&ldquo;open lcp&rdquo;</u>. The server automatically get out of terminal mode after few seconds. There is a connection, the three &ldquo;p&rdquo; are now in upper case.</div>
+
+<div class="standard" id='magicparlabel-1176'>Now, on both client and server, if we check up with <u>ifconfig</u> we see that we have ip adresses corresponding to 10.0.0.1 and 10.0.0.2.</div>
+
+<div class="standard" id='magicparlabel-1217'>Client and server can now ping each other.</div>
+<h3 class="subsection" id='magicparlabel-1313'><span class="subsection_label">2.3</span> Disabling Compression Control Protocols CCP</h3>
+<div class="standard" id='magicparlabel-1428'>To increase efficiency PPP comes with some compression protocols. In our PPP console, if we type :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>show ccp</pre></div>
+
+
+<div class="standard" id='magicparlabel-1471'>We can see there is a compression protocol called deflate. We want to disable it to see the escaping characters later. </div>
+
+<div class="standard" id='magicparlabel-1493'>To do that we run in our PPP console :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>disable deflate
+deny deflate
+open lcp</pre></div>
+
+
+<div class="standard" id='magicparlabel-1576'><u><b>NB:</b></u><b> </b>We re-run open lcp to tell the client we disabled deflate.</div>
+
+<div class="standard" id='magicparlabel-1581'>When we re-run show ccp in our PPP console, we see that we have another compression protocol now : pred1. We need to disable it also :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>disable pred1
+deny pred1
+open lcp</pre></div>
+
+
+<div class="standard" id='magicparlabel-1645'>Now if we run show ccp, we see &ldquo;none&rdquo;, We successfully disabled compression.</div>
+<h3 class="subsection" id='magicparlabel-1760'><span class="subsection_label">2.4</span> Seeing the escaping characters with Wireshark and though RTT</h3>
+<div class="standard" id='magicparlabel-1764'>To force the system to use escaping characters we just use the -p option in ping :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>ping -p 7e 10.0.0.1</pre></div>
+
+
+<div class="standard" id='magicparlabel-1937'>On wireshark what we see in the ping packet is :</div>
+
+<div class="standard" id='magicparlabel-1944'>7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e </div>
+
+<div class="standard" id='magicparlabel-1952'>Where are the escape characters ?</div>
+
+<div class="standard" id='magicparlabel-1957'>There is definately the escape mechanism. It is clear by the RTT alone. A normal ping takes <u>190ms</u> without compression. The ping with the -p option containing the flag takes <u>290ms</u>. </div>
+
+<div class="standard" id='magicparlabel-2080'>Wireshark does not show physical frame. The data are preprocessed by wireshark, sometime the data are preprocessed before even arriving to wireshark.</div>
+<h2 class="section" id='magicparlabel-2096'><span class="section_label">3</span> Forcibly seeing the real HDLC-like frame</h2>
+<h3 class="subsection" id='magicparlabel-2203'><span class="subsection_label">3.1</span> Method to see the frame</h3>
+<div class="standard" id='magicparlabel-2207'>We still want to see the escaping mechanism in action. Wireshark cannot do it. If we are intelligent enough we can somehow manage to see the frame.</div>
+
+<div class="standard" id='magicparlabel-2213'>If we want to summarize the mechanism before it will look like this :</div>
+
+<div class="standard" style='text-align: center;' id='magicparlabel-2322'><img style='width:40%;' src='3_home_almounah_Desktop_ENSIMAG_2A_semestre_2_transport_raw_pasted4.png' alt='image: 3_home_almounah_Desktop_ENSIMAG_2A_semestre_2_transport_raw_pasted4.png' />
+</div>
+
+<div class="standard" id='magicparlabel-2843'>Now what happens if the PPP process dies on the server while the client is sending IP packets ?</div>
+
+<div class="standard" id='magicparlabel-2872'>That what we will be exploiting. We redirected the output to the <u><b>tip</b></u> command we saw earlier. </div>
+
+<div class="standard" id='magicparlabel-2982'>It is like we are cutting a cable and reconnecting it elsewhere.</div>
+
+<div class="standard" id='magicparlabel-2991'>What we want to do is something like this :</div>
+
+<div class="standard" style='text-align: center;' id='magicparlabel-2994'><img src='4_home_almounah_Desktop_ENSIMAG_2A_semestre_2_transport_raw_pasted5.png' alt='image: 4_home_almounah_Desktop_ENSIMAG_2A_semestre_2_transport_raw_pasted5.png' />
+</div>
+
+<div class="standard" id='magicparlabel-3230'>The frame will then be in the file &ldquo;myfile.dmp&rdquo;.</div>
+<h3 class="subsection" id='magicparlabel-3259'><span class="subsection_label">3.2</span> Applying the method</h3>
+<div class="standard" id='magicparlabel-3263'>To apply the method we start by pinging the server from the client with :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>ping -p 7e 10.0.0.1</pre></div>
+
+
+<div class="standard" id='magicparlabel-3295'>On the server we kill ppp with :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>killall -9 ppp</pre></div>
+
+
+<div class="standard" id='magicparlabel-3353'>We simply redirect the output with tip :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>tip cuau0c &gt; myfile.dmp</pre></div>
+
+
+<div class="standard" id='magicparlabel-3393'>We then wait 3 secs to get some traffic. And we can know see myfile.dmp with :</div>
+
+
+<div class='float-listings'><pre class ='listings sh'>hexdump -C myfile.dmp</pre></div>
+
+
+<div class="standard" id='magicparlabel-3435'>Now we can actually see <u>0x7d, 0x5e</u> instead of <u>0x7e</u>.</div>
+</body>
+</html>

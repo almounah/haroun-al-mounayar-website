@@ -6,82 +6,189 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Haroun Al Mounayar</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" type="text/css" href="home_text.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"
+    />
+    <script
+      src="https://code.jquery.com/jquery-2.2.0.min.js"
+      type="text/javascript"
+    ></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Calligraffitti"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Indie+Flower"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&display=swap"
+      rel="stylesheet"
+    />
+    <script type="text/javascript" src="slideshow.js"></script>
   </head>
   <body id="body">
-    <br />
-    <h1 id="head">Haroun Al Mounayar Web Page</h1>
-    <img id="me" src="me.png" />
-    <br />
-    <div id="button_bar">
-      <button class="button_of_current_page" disabled>HOME</button>
-
-      <button
-        class="button_project"
-        onclick="window.location.href='project/project_index.htm';"
-      >
-        Projects
-      </button>
-
-      <button
-        class="button_github"
-        onclick="window.location.href='https://www.root-me.org/HarorOfLaughtale?inc=score&lang=en';"
-      >
-        Root-me
-      </button>
-
-      <button
-        class="button_contact"
-        onclick="window.location.href='contact/contact.htm';"
-      >
-        Contact
-      </button>
-    </div>
-    <br />
-    <h3 class="likesectionHead"><a id="x1-1000"></a>About</h3>
-    <p class="noindent">Hello,</p>
-    <p class="noindent">
-      I am Haroun Al Mounayar, a student at Grenoble-INP Ensimag. Welcome to my
-      personnal site.
-    </p>
-    <p class="noindent">
-      Here you can see some of the projects (but not all of them) that i did or
-      projects i am currently working on. You are free to use any of the
-      information on the site for educational purposes.
-    </p>
-
-    <p class="noindent">
-      If you want to contact me, you will find information on the contact page.
-    </p>
-    <p class="noindent">
-      Some of the source code are available on the Github Page.
-    </p>
-    <p class="noindent">I can provide my full CV if needed (on request).</p>
-    <p class="noindent">
+    <section class="hero">
+      <h1>Become the sword, Cut despair</h1>
+    </section>
+    <section class="content">
+      <img id="me" src="me.png" />
       <br />
-    </p>
+      <ul class="navbar">
+        <li><a class="active_button" href="">Home</a></li>
+        <li>
+          <a href=""> CV <i class="fa fa-download" aria-hidden="true"></i> </a>
+        </li>
+        <li><a href="project/project_index.htm">Projects</a></li>
+        <li><a href="social/social.htm">Social</a></li>
+      </ul>
 
-    <h3 class="likesectionHead"><a id="x1-2000"></a>Knowledge</h3>
-    <p class="noindent">I have a particular interest for :</p>
-    <ul class="itemize1">
-      <li class="itemize">Cybersecurity</li>
-      <li class="itemize">Networking</li>
-      <li class="itemize">Embedded Systems and IoT</li>
-      <li class="itemize">Programming (Python, C, Assembly, Web, ...)</li>
-    </ul>
-    <p class="noindent">
-      All of my projects are done on my laptop having Kali linux as the main Os.
-    </p>
-    <p class="noindent">
+      <div>
+        <div class="presentation">
+          <img src="myself.jpg" class="img_intro" />
+          <p class="text_intro">
+            Hi, I am Haroun, this is my website where I keep all of my thoughts
+            and links to everything I do on the internet.
+          </p>
+        </div>
+      </div>
+
+      <div class="slideshow">
+        <img class="mySlides fade" src="Interests.jpg" />
+        <img class="mySlides fade" src="story.jpg" />
+        <img class="mySlides fade" src="hobbies.jpg" />
+        <img class="mySlides fade" src="other.jpg" />
+        <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+        <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        <div style="text-align: center">
+          <span class="dot" onclick="currentSlide(1)"></span>
+          <span class="dot" onclick="currentSlide(2)"></span>
+          <span class="dot" onclick="currentSlide(3)"></span>
+          <span class="dot" onclick="currentSlide(4)"></span>
+        </div>
+      </div>
+
+      <div class="Blog">
+        <p class="blog_title">
+          Recently Published
+          <i class="fa fa-hourglass-half" aria-hidden="true"></i>
+        </p>
+
+        <! –– A post beginning ––>
+        <div class="blog_post">
+          <div class="left">
+            <img src="wireshark.png" class="post_image" />
+          </div>
+          <div class="right">
+            <p class="post_date">March 2022</p>
+            <p class="post_title">Wireshark sometimes hides the truth</p>
+            <p class="post_description">
+              Wireshark is the best tool to capture traffic (after tcpdump of
+              course) on a network. However the traffic show by wireshark is not
+              always the real one circulating physically. In this article we
+              will see how Wireshark hides the escaping mechanism on HDLC-like
+              protocols and we show a way to actually see the real frame.
+            </p>
+            <br />
+            <div class="post_more">
+              <a
+                href="project/network/wireshark_hdlc/wirshark_hdlc.html"
+                class="post_more"
+                >Read More
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <br />
+        <! -- A post ending -->
+
+        <! –– A post beginning ––>
+        <div class="blog_post">
+          <div class="left">
+            <img src="connex.jpg" class="post_image" />
+          </div>
+          <div class="right">
+            <p class="post_date">January 2021</p>
+            <p class="post_title">Fastest way to connect points</p>
+            <p class="post_description">
+              Given a number of points in a plane and a distance d, we seek the
+              most optimal way to connect the points located at a distance at
+              most d. The final goal is to calculate the size of strongly
+              connected components.
+            </p>
+            <br />
+            <div class="post_more">
+              <a href="project/algo/cfc_delaunay/rapport.html" class="post_more"
+                >Read More
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <br />
+        <! -- A post ending -->
+        <br />
+        <div class="all_projects">
+          <a href="project/project_index.htm" class="all_projects_text"
+            >See all published projects
+            <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
       <br />
-    </p>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <footer>
+        <br />
+        <p>
+          Made with Neovim and Love on kali from scratch by Haroun Al Mounayar
+        </p>
+        <p style="color: #90ddf0">
+          Copyright © 2022, All Right Reserved almounah
+        </p>
+      </footer>
+      <script>
+        // Parallax
+        $(document).ready(function () {
+          $(window).scroll(function (e) {
+            parallax();
+          });
 
-    <h3 class="likesectionHead"><a id="x1-3000"></a>Hobbies</h3>
-    <p class="noindent">In my free time i mainly :</p>
-    <ul class="itemize1">
-      <li class="itemize">Watch Anime</li>
-      <li class="itemize">Read Mangas</li>
-      <li class="itemize">Go out with Friends</li>
-    </ul>
+          function parallax() {
+            var scrolled = $(window).scrollTop();
+            $(".hero").css("top", -(scrolled * 0.0315) + "rem");
+            $(".hero > h1").css("top", -(scrolled * -0.005) + "rem");
+            $(".hero > h1").css("opacity", 1 - scrolled * 0.00175);
+          }
+        });
+      </script>
+      <script>
+        showSlides(slideIndex);
+      </script>
+    </section>
   </body>
 </html>
