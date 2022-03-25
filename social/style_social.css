@@ -17,7 +17,7 @@
 }
 @media (max-width: 1000px) {
   .head {
-    width: fit-content;
+    width: auto;
     height: 60vh;
   }
 }
@@ -229,4 +229,3 @@ footer p {
   padding-bottom: 5px;
   font-size: 12px;
 }
-
